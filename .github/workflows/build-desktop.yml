@@ -74,7 +74,7 @@ jobs:
         if: steps.build.outcome == 'failure'
         shell: pwsh
         run: |
-          $tail = Get-Content build-desktop.log -Tail 120
+          $tail = Get-Content build-desktop.log -Tail 25
           "### Desktop build failure" >> $env:GITHUB_STEP_SUMMARY
           '```text' >> $env:GITHUB_STEP_SUMMARY
           $tail >> $env:GITHUB_STEP_SUMMARY
