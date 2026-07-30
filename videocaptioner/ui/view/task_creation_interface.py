@@ -5,7 +5,7 @@ import sys
 from urllib.parse import urlparse
 
 from PyQt5.QtCore import QStandardPaths, Qt, pyqtSignal
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QKeySequence, QPixmap
 from PyQt5.QtWidgets import (
     QApplication,
     QFileDialog,
@@ -48,6 +48,10 @@ class UrlLineEdit(LineEdit):
     """URL input with a Windows-style Ctrl+V fallback on macOS."""
 
     def keyPressEvent(self, event):
+        if event.matches(QKeySequence.Paste):
+            self.paste()
+            event.accept()
+            return
         if (
             sys.platform == "darwin"
             and event.key() == Qt.Key_V

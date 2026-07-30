@@ -186,6 +186,7 @@ def prepare_ffmpeg() -> None:
 def build_pyinstaller() -> None:
     env = os.environ.copy()
     env["VIDEOCAPTIONER_DESKTOP_RUNTIME_DIR"] = str(RUNTIME_DIR)
+    env["VIDEOCAPTIONER_DESKTOP_VERSION"] = _version()
     _run([
         sys.executable,
         "-m",

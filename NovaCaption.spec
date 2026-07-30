@@ -2,6 +2,7 @@
 """PyInstaller build recipe for the NovaCaption desktop bundle."""
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -14,6 +15,9 @@ RUNTIME_DIR = Path(os.environ.get("VIDEOCAPTIONER_DESKTOP_RUNTIME_DIR", ROOT / "
 APP_ICON = ROOT / "resource" / "assets" / (
     "novacaption.icns" if sys.platform == "darwin" else "novacaption.ico"
 )
+APP_VERSION = os.environ.get("VIDEOCAPTIONER_DESKTOP_VERSION", "0.0.0")
+version_match = re.match(r"\d+\.\d+\.\d+", APP_VERSION)
+BUNDLE_SHORT_VERSION = version_match.group(0) if version_match else "0.0.0"
 
 
 def _data(src: Path, dest: str):
@@ -104,7 +108,11 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    # A console bootloader makes a bundled macOS application background-only
+    # (LSBackgroundOnly=1). That removes its Dock icon and prevents reliable
+    # keyboard focus/paste handling. Windows retains the console bootloader so
+    # the same executable can continue to serve both GUI and CLI use cases.
+    console=sys.platform != "darwin",
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
@@ -133,6 +141,9 @@ if sys.platform == "darwin":
         info_plist={
             "CFBundleName": "NovaCaption",
             "CFBundleDisplayName": "NovaCaption",
+            "CFBundleShortVersionString": BUNDLE_SHORT_VERSION,
+            "CFBundleVersion": BUNDLE_SHORT_VERSION,
+            "LSBackgroundOnly": False,
             "NSHighResolutionCapable": True,
         },
     )

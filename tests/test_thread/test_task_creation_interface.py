@@ -37,6 +37,20 @@ def test_paste_button_reads_clipboard_and_normalizes_url(qapp):
 
 
 @pytest.mark.skipif(sys.platform != "darwin", reason="macOS modifier mapping")
+def test_macos_command_v_pastes(qapp):
+    interface = TaskCreationInterface()
+    interface.show()
+    interface.search_input.setFocus()
+    QApplication.clipboard().setText("https://example.com/command-v")
+
+    # Qt represents the physical Command key as ControlModifier on macOS.
+    QTest.keyClick(interface.search_input, Qt.Key_V, Qt.ControlModifier)
+
+    assert interface.search_input.text() == "https://example.com/command-v"
+    interface.close()
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="macOS modifier mapping")
 def test_macos_control_v_compatibility_pastes_instead_of_typing_v(qapp):
     interface = TaskCreationInterface()
     interface.show()
