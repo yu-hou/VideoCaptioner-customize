@@ -3,7 +3,7 @@ import os
 import shutil
 
 import psutil
-from PyQt5.QtCore import QSize, QThread, QUrl
+from PyQt5.QtCore import QSize, QThread, QTimer, QUrl
 from PyQt5.QtGui import QDesktopServices, QIcon
 from PyQt5.QtWidgets import QApplication
 from qfluentwidgets import FluentIcon as FIF
@@ -20,6 +20,7 @@ from videocaptioner.config import ASSETS_PATH, GITHUB_REPO_URL
 from videocaptioner.core.constant import INFOBAR_DURATION_FOREVER
 from videocaptioner.ui.common.config import cfg
 from videocaptioner.ui.components.DonateDialog import DonateDialog
+from videocaptioner.ui.components.FirstRunWizard import FirstRunWizard
 from videocaptioner.ui.thread.version_checker_thread import VersionChecker
 from videocaptioner.ui.view.batch_process_interface import BatchProcessInterface
 from videocaptioner.ui.view.home_interface import HomeInterface
@@ -58,6 +59,9 @@ class MainWindow(FluentWindow):
 
         # 检查系统依赖
         self._check_ffmpeg()
+
+        if not cfg.get(cfg.first_run_completed):
+            QTimer.singleShot(0, self._show_first_run_wizard)
 
         # 注册退出处理， 清理进程
         atexit.register(self.stop)
@@ -208,3 +212,8 @@ class MainWindow(FluentWindow):
                 position=InfoBarPosition.BOTTOM,
                 parent=self,
             )
+
+    def _show_first_run_wizard(self):
+        """首次启动时显示面向普通用户的配置向导。"""
+        self.firstRunWizard = FirstRunWizard(self)
+        self.firstRunWizard.exec_()

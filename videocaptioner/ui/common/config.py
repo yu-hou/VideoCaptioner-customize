@@ -76,6 +76,13 @@ class PlatformAwareTranscribeModelValidator(OptionsValidator):
 class Config(QConfig):
     """应用配置"""
 
+    # ------------------- 首次启动与下载配置 -------------------
+    first_run_completed = ConfigItem(
+        "Onboarding", "FirstRunCompleted", False, BoolValidator()
+    )
+    douyin_chrome_profile = ConfigItem("Download", "DouyinChromeProfile", "")
+    douyin_test_url = ConfigItem("Download", "DouyinTestUrl", "")
+
     # LLM配置
     llm_service = OptionsConfigItem(
         "LLM",

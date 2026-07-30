@@ -1,6 +1,7 @@
 import os
 import re
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 import requests
 import yt_dlp
@@ -10,6 +11,25 @@ from videocaptioner.config import APPDATA_PATH
 from videocaptioner.core.utils.logger import setup_logger
 
 logger = setup_logger("video_download_thread")
+
+
+def normalize_video_url(url: str) -> str:
+    """将已知的视频分享页链接转换为 yt-dlp 支持的标准链接。"""
+    try:
+        parsed_url = urlsplit(url)
+    except ValueError:
+        return url
+
+    hostname = (parsed_url.hostname or "").lower()
+    is_douyin_host = hostname == "douyin.com" or hostname.endswith(".douyin.com")
+    if not is_douyin_host or parsed_url.path.rstrip("/") != "/jingxuan":
+        return url
+
+    modal_id = parse_qs(parsed_url.query).get("modal_id", [""])[0]
+    if not modal_id.isdigit():
+        return url
+
+    return f"https://www.douyin.com/video/{modal_id}"
 
 
 class VideoDownloadThread(QThread):
@@ -23,7 +43,9 @@ class VideoDownloadThread(QThread):
 
     def __init__(self, url: str, work_dir: str):
         super().__init__()
-        self.url = url
+        self.url = normalize_video_url(url)
+        if self.url != url:
+            logger.info("抖音精选链接已转换为标准视频链接: %s", self.url)
         self.work_dir = work_dir
 
     def run(self):
