@@ -167,6 +167,18 @@ def main() -> int:
                 raise RuntimeError(f"Output duration is unexpectedly short: {output} ({seconds:.2f}s)")
             print(f"Verified {output.name}: {output.stat().st_size} bytes, {seconds:.2f}s")
 
+        if platform.system() == "Darwin":
+            gui_result = tmp_path / "gui-smoke.json"
+            gui_env = env.copy()
+            gui_env["VIDEOCAPTIONER_GUI_SMOKE_OUTPUT"] = str(gui_result)
+            _run([str(exe), "gui"], env=gui_env)
+            if not gui_result.exists():
+                raise RuntimeError("Packaged GUI clipboard smoke result was not created")
+            gui_checks = json.loads(gui_result.read_text(encoding="utf-8"))
+            if not gui_checks.get("ok"):
+                raise RuntimeError(f"Packaged GUI clipboard smoke failed: {gui_checks}")
+            print(f"Verified packaged GUI clipboard: {gui_checks}")
+
     return 0
 
 

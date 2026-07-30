@@ -8,7 +8,8 @@ import sys
 def main():
     import traceback
 
-    from PyQt5.QtCore import QEvent, QObject, Qt, QTranslator
+    from PyQt5.QtCore import QEvent, QObject, Qt, QTimer, QTranslator
+    from PyQt5.QtGui import QKeyEvent
     from PyQt5.QtWidgets import QApplication
 
     from videocaptioner.config import TRANSLATIONS_PATH
@@ -90,6 +91,70 @@ def main():
 
     w = MainWindow()
     w.show()
+
+    # Packaged GUI smoke test. This is inert during normal use and lets the
+    # build pipeline verify the frozen app's real clipboard integration without
+    # relying on macOS Accessibility permissions for external UI automation.
+    smoke_output = os.environ.get("VIDEOCAPTIONER_GUI_SMOKE_OUTPUT")
+    if smoke_output:
+        def run_gui_smoke():
+            import json
+            from pathlib import Path
+
+            expected_command = "https://example.com/command-v"
+            expected_control = "https://example.com/control-v"
+            expected_button = "https://www.douyin.com/video/7659705531116870065"
+            results = {}
+            try:
+                interface = w.homeInterface.task_creation_interface
+                field = interface.search_input
+                clipboard = QApplication.clipboard()
+
+                clipboard.setText(expected_command)
+                field.clear()
+                QApplication.sendEvent(
+                    field,
+                    QKeyEvent(
+                        QEvent.KeyPress,
+                        Qt.Key_V,
+                        Qt.ControlModifier,
+                    ),
+                )
+                results["command_v"] = field.text()
+
+                clipboard.setText(expected_control)
+                field.clear()
+                QApplication.sendEvent(
+                    field,
+                    QKeyEvent(
+                        QEvent.KeyPress,
+                        Qt.Key_V,
+                        Qt.MetaModifier,
+                    ),
+                )
+                results["control_v"] = field.text()
+
+                clipboard.setText(f"分享这个视频 {expected_button} 复制后打开")
+                field.clear()
+                interface.paste_from_clipboard()
+                results["paste_button"] = field.text()
+                results["ok"] = results == {
+                    "command_v": expected_command,
+                    "control_v": expected_control,
+                    "paste_button": expected_button,
+                }
+            except Exception:
+                results["ok"] = False
+                results["error"] = traceback.format_exc()
+
+            Path(smoke_output).write_text(
+                json.dumps(results, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            app.exit(0 if results["ok"] else 1)
+
+        QTimer.singleShot(250, run_gui_smoke)
+
     sys.exit(app.exec_())
 
 
