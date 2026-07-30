@@ -6,7 +6,7 @@ import sys
 import psutil
 from PyQt5.QtCore import QSize, QThread, QTimer, QUrl
 from PyQt5.QtGui import QDesktopServices, QIcon, QKeySequence
-from PyQt5.QtWidgets import QAction, QApplication
+from PyQt5.QtWidgets import QAction, QApplication, QMenuBar
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import (
     FluentWindow,
@@ -88,7 +88,12 @@ class MainWindow(FluentWindow):
         if sys.platform != "darwin":
             return
 
-        edit_menu = self.menuBar().addMenu(self.tr("编辑"))
+        # FluentWindow inherits QWidget rather than QMainWindow, so it has no
+        # menuBar() helper. A parented native QMenuBar is enough for macOS to
+        # expose the standard application Edit menu.
+        self._mac_menu_bar = QMenuBar(self)
+        self._mac_menu_bar.setNativeMenuBar(True)
+        edit_menu = self._mac_menu_bar.addMenu(self.tr("编辑"))
         actions = (
             (self.tr("撤销"), QKeySequence.Undo, "undo"),
             (self.tr("重做"), QKeySequence.Redo, "redo"),
