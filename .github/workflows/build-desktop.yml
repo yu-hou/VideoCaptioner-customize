@@ -62,7 +62,23 @@ jobs:
         run: choco install innosetup --no-progress -y
 
       - name: Build desktop bundle
-        run: uv run --with pyinstaller --with static-ffmpeg python scripts/build_desktop.py --clean
+        id: build
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          uv run --with pyinstaller --with static-ffmpeg python scripts/build_desktop.py --clean 2>&1 |
+            Tee-Object -FilePath build-desktop.log
+          exit $LASTEXITCODE
+
+      - name: Report desktop build failure
+        if: steps.build.outcome == 'failure'
+        shell: pwsh
+        run: |
+          "### Desktop build failure" >> $env:GITHUB_STEP_SUMMARY
+          '```text' >> $env:GITHUB_STEP_SUMMARY
+          Get-Content build-desktop.log -Tail 120 >> $env:GITHUB_STEP_SUMMARY
+          '```' >> $env:GITHUB_STEP_SUMMARY
+          exit 1
 
       - name: Smoke test packaged app
         run: uv run python scripts/smoke_desktop.py dist/NovaCaption
