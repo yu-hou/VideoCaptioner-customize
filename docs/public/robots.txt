@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://weifeng2333.github.io/VideoCaptioner/sitemap.xml
+Sitemap: https://yu-hou.github.io/VideoCaptioner-customize/sitemap.xml

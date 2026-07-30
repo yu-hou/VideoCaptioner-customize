@@ -1,6 +1,6 @@
 # 贡献指南
 
-感谢你对 VideoCaptioner 的贡献！
+感谢你对 NovaCaption 的贡献！
 
 ## 开发环境设置
 
@@ -10,7 +10,7 @@
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/VideoCaptioner.git
-cd VideoCaptioner
+cd NovaCaption
 pip install -r requirements.txt
 ```
 
@@ -44,4 +44,4 @@ uv run ruff check --select I --fix .
 - [架构设计](/dev/architecture)
 - [API 文档](/dev/api)
 
-更多信息请参考 [GitHub Issues](https://github.com/WEIFENG2333/VideoCaptioner/issues)。
+更多信息请参考 [GitHub Issues](https://github.com/yu-hou/VideoCaptioner-customize/issues)。

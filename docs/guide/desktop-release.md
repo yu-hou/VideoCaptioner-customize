@@ -1,15 +1,15 @@
 # Desktop release build
 
-VideoCaptioner publishes desktop bundles for Windows and macOS from GitHub Actions.
+NovaCaption publishes desktop bundles for Windows and macOS from GitHub Actions.
 Users can download the zip files from a GitHub Release, extract them, and run the
-bundled `VideoCaptioner` executable without installing Python or FFmpeg.
+bundled `NovaCaption` executable without installing Python or FFmpeg.
 
 ## Local build
 
 ```bash
 uv sync --frozen
 uv run --with pyinstaller --with static-ffmpeg python scripts/build_desktop.py --clean
-uv run python scripts/smoke_desktop.py dist/VideoCaptioner
+uv run python scripts/smoke_desktop.py dist/NovaCaption
 ```
 
 The build script downloads static `ffmpeg` and `ffprobe` for the current platform

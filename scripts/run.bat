@@ -2,17 +2,17 @@
 chcp 65001 >nul
 setlocal EnableDelayedExpansion
 
-:: VideoCaptioner Installer & Launcher for Windows
+:: NovaCaption Installer & Launcher for Windows
 :: Usage: Download and run this script, or run from project directory
 
 :: Configuration
-set "REPO_URL=https://github.com/WEIFENG2333/VideoCaptioner.git"
-if not defined VIDEOCAPTIONER_HOME set "INSTALL_DIR=%USERPROFILE%\VideoCaptioner"
+set "REPO_URL=https://github.com/yu-hou/VideoCaptioner-customize.git"
+if not defined VIDEOCAPTIONER_HOME set "INSTALL_DIR=%USERPROFILE%\NovaCaption"
 if defined VIDEOCAPTIONER_HOME set "INSTALL_DIR=%VIDEOCAPTIONER_HOME%"
 
 echo.
 echo ==================================
-echo   VideoCaptioner Installer
+echo   NovaCaption Installer
 echo ==================================
 echo.
 
@@ -145,7 +145,7 @@ if exist "%INSTALL_DIR%\.git" (
     exit /b 0
 )
 
-echo [INFO] Cloning VideoCaptioner to %INSTALL_DIR%...
+echo [INFO] Cloning NovaCaption to %INSTALL_DIR%...
 git clone --depth 1 "%REPO_URL%" "%INSTALL_DIR%"
 if !errorlevel! neq 0 (
     echo [ERROR] Failed to clone repository
@@ -168,7 +168,7 @@ exit /b 0
 
 :run_app
 echo.
-echo [INFO] Starting VideoCaptioner...
+echo [INFO] Starting NovaCaption...
 echo.
 uv run videocaptioner
 if !errorlevel! neq 0 (

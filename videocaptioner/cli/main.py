@@ -1,4 +1,4 @@
-"""VideoCaptioner CLI — AI-powered video captioning from the command line.
+"""NovaCaption CLI — AI-powered video captioning from the command line.
 
 Usage:
     videocaptioner <command> [options]
@@ -143,7 +143,7 @@ def _build_gui_parser(subparsers) -> None:
     p = subparsers.add_parser(
         "gui",
         help="Launch the desktop app",
-        description="Launch the VideoCaptioner desktop app.",
+        description="Launch the NovaCaption desktop app.",
     )
     p.set_defaults(func=_run_gui)
 
@@ -434,7 +434,7 @@ def _build_config_parser(subparsers) -> None:
     p = subparsers.add_parser(
         "config",
         help="Manage configuration",
-        description="View, edit, and manage VideoCaptioner configuration.",
+        description="View, edit, and manage NovaCaption configuration.",
     )
     config_sub = p.add_subparsers(dest="config_action", metavar="action")
 
@@ -444,7 +444,7 @@ def _build_config_parser(subparsers) -> None:
         "init",
         help="Create an onboarding config file",
         description=(
-            "Create a VideoCaptioner config file. By default this starts an interactive setup. "
+            "Create a NovaCaption config file. By default this starts an interactive setup. "
             "Use --non-interactive for Agent/CI-friendly setup."
         ),
     )

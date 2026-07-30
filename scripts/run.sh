@@ -1,12 +1,12 @@
 #!/bin/bash
-# VideoCaptioner Installer & Launcher for macOS/Linux
-# Usage: curl -fsSL https://raw.githubusercontent.com/WEIFENG2333/VideoCaptioner/main/scripts/run.sh | bash
+# NovaCaption Installer & Launcher for macOS/Linux
+# Usage: curl -fsSL https://raw.githubusercontent.com/yu-hou/VideoCaptioner-customize/main/scripts/run.sh | bash
 
 set -e
 
 # Configuration
-REPO_URL="https://github.com/WEIFENG2333/VideoCaptioner.git"
-INSTALL_DIR="${VIDEOCAPTIONER_HOME:-$HOME/VideoCaptioner}"
+REPO_URL="https://github.com/yu-hou/VideoCaptioner-customize.git"
+INSTALL_DIR="${VIDEOCAPTIONER_HOME:-$HOME/NovaCaption}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -170,7 +170,7 @@ setup_repository() {
             git pull --ff-only 2>/dev/null || print_warning "Could not update (local changes?)"
         fi
     else
-        print_info "Cloning VideoCaptioner to $INSTALL_DIR..."
+        print_info "Cloning NovaCaption to $INSTALL_DIR..."
         git clone --depth 1 "$REPO_URL" "$INSTALL_DIR"
         cd "$INSTALL_DIR"
         print_success "Repository cloned successfully"
@@ -186,7 +186,7 @@ install_dependencies() {
 
 # Run the application
 run_app() {
-    print_info "Starting VideoCaptioner..."
+    print_info "Starting NovaCaption..."
     echo ""
     cd "$INSTALL_DIR"
     uv run videocaptioner
@@ -196,7 +196,7 @@ run_app() {
 main() {
     echo ""
     echo "=================================="
-    echo "  VideoCaptioner Installer"
+    echo "  NovaCaption Installer"
     echo "=================================="
     echo ""
 

@@ -480,7 +480,7 @@ class MyVideoWidget(QWidget):
 
         # 设置初始窗口大小
         self.resize(800, 600)
-        self.setWindowTitle("VideoCaptioner")
+        self.setWindowTitle("NovaCaption")
         self.setWindowIcon(QIcon(str(RESOURCE_PATH / "assets" / "logo.png")))
 
         # 创建一个专门用于视频输出的 widget

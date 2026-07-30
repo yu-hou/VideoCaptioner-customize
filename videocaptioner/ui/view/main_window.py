@@ -16,10 +16,14 @@ from qfluentwidgets import (
     SplashScreen,
 )
 
-from videocaptioner.config import ASSETS_PATH, GITHUB_REPO_URL
+from videocaptioner.config import (
+    APP_DISPLAY_NAME,
+    ASSETS_PATH,
+    GITHUB_REPO_URL,
+    UPSTREAM_PROJECT_URL,
+)
 from videocaptioner.core.constant import INFOBAR_DURATION_FOREVER
 from videocaptioner.ui.common.config import cfg
-from videocaptioner.ui.components.DonateDialog import DonateDialog
 from videocaptioner.ui.components.FirstRunWizard import FirstRunWizard
 from videocaptioner.ui.thread.version_checker_thread import VersionChecker
 from videocaptioner.ui.view.batch_process_interface import BatchProcessInterface
@@ -27,6 +31,7 @@ from videocaptioner.ui.view.home_interface import HomeInterface
 from videocaptioner.ui.view.llm_logs_interface import LLMLogsInterface
 from videocaptioner.ui.view.setting_interface import SettingInterface
 from videocaptioner.ui.view.subtitle_style_interface import SubtitleStyleInterface
+from videocaptioner.ui.view.user_guide_interface import UserGuideInterface
 
 LOGO_PATH = ASSETS_PATH / "logo.png"
 
@@ -42,6 +47,16 @@ class MainWindow(FluentWindow):
         self.subtitleStyleInterface = SubtitleStyleInterface(self)
         self.batchProcessInterface = BatchProcessInterface(self)
         self.llmLogsInterface = LLMLogsInterface(self)
+        self.userGuideInterface = UserGuideInterface(self)
+        self.userGuideInterface.restartWizardRequested.connect(
+            self._show_first_run_wizard
+        )
+        self.userGuideInterface.openHomeRequested.connect(
+            lambda: self.switchTo(self.homeInterface)
+        )
+        self.userGuideInterface.openSettingsRequested.connect(
+            lambda: self.switchTo(self.settingInterface)
+        )
 
         # 初始化版本检查器
         self.versionChecker = VersionChecker()
@@ -73,6 +88,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.batchProcessInterface, FIF.VIDEO, self.tr("批量处理"))
         self.addSubInterface(self.subtitleStyleInterface, FIF.FONT, self.tr("字幕样式"))
         self.addSubInterface(self.llmLogsInterface, FIF.HISTORY, self.tr("请求日志"))
+        self.addSubInterface(self.userGuideInterface, FIF.HELP, self.tr("使用指南"))
 
         self.navigationInterface.addSeparator()
 
@@ -98,7 +114,7 @@ class MainWindow(FluentWindow):
         if interface.windowTitle():
             self.setWindowTitle(interface.windowTitle())
         else:
-            self.setWindowTitle(self.tr("卡卡字幕助手 -- VideoCaptioner"))
+            self.setWindowTitle(APP_DISPLAY_NAME)
         self.stackedWidget.setCurrentWidget(interface, popOut=False)
 
     def initWindow(self):
@@ -106,7 +122,7 @@ class MainWindow(FluentWindow):
         self.resize(1050, 800)
         self.setMinimumWidth(700)
         self.setWindowIcon(QIcon(str(LOGO_PATH)))
-        self.setWindowTitle(self.tr("卡卡字幕助手 -- VideoCaptioner"))
+        self.setWindowTitle(APP_DISPLAY_NAME)
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 
@@ -126,20 +142,19 @@ class MainWindow(FluentWindow):
     def onGithubDialog(self):
         """打开GitHub"""
         w = MessageBox(
-            self.tr("GitHub信息"),
+            self.tr("项目信息"),
             self.tr(
-                "VideoCaptioner 由本人在课余时间独立开发完成，目前托管在GitHub上，欢迎Star和Fork。项目诚然还有很多地方需要完善，遇到软件的问题或者BUG欢迎提交Issue。\n\n https://github.com/WEIFENG2333/VideoCaptioner"
+                "NovaCaption 是基于开源项目 VideoCaptioner 的独立定制版本，"
+                "并非上游作者发布或认可的官方商业版本。\n\n"
+                f"当前项目：{GITHUB_REPO_URL}\n"
+                f"上游项目：{UPSTREAM_PROJECT_URL}"
             ),
             self,
         )
-        w.yesButton.setText(self.tr("打开 GitHub"))
-        w.cancelButton.setText(self.tr("支持作者"))
+        w.yesButton.setText(self.tr("打开项目主页"))
+        w.cancelButton.setText(self.tr("关闭"))
         if w.exec():
             QDesktopServices.openUrl(QUrl(GITHUB_REPO_URL))
-        else:
-            # 点击"支持作者"按钮时打开捐赠对话框
-            donate_dialog = DonateDialog(self)
-            donate_dialog.exec_()
 
     def onNewVersion(self, version, update_required, update_info, download_url):
         """新版本提示"""
@@ -214,6 +229,11 @@ class MainWindow(FluentWindow):
             )
 
     def _show_first_run_wizard(self):
-        """首次启动时显示面向普通用户的配置向导。"""
+        """Show or reactivate the setup wizard."""
+        existing = getattr(self, "firstRunWizard", None)
+        if existing is not None and existing.isVisible():
+            existing.raise_()
+            existing.activateWindow()
+            return
         self.firstRunWizard = FirstRunWizard(self)
         self.firstRunWizard.exec_()

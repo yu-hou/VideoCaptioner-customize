@@ -1,5 +1,5 @@
 ---
-title: LLM 配置指南 - VideoCaptioner
+title: LLM 配置指南 - NovaCaption
 description: 详细的 LLM API 配置教程，支持 OpenAI、DeepSeek、SiliconCloud、Gemini、Ollama 等多种服务商。包含费用估算和优化建议。
 head:
   - - meta
@@ -9,7 +9,7 @@ head:
 
 # LLM 配置指南
 
-LLM（大语言模型）是 VideoCaptioner 的核心功能之一，用于字幕断句、优化和翻译。本指南将帮助你配置 LLM API。
+LLM（大语言模型）是 NovaCaption 的核心功能之一，用于字幕断句、优化和翻译。本指南将帮助你配置 LLM API。
 
 ## 为什么需要配置 LLM？
 
@@ -27,7 +27,7 @@ LLM（大语言模型）是 VideoCaptioner 的核心功能之一，用于字幕�
 
 ## 支持的 LLM 服务商
 
-VideoCaptioner 支持多种 LLM 服务商，你可以根据自己的需求选择：
+NovaCaption 支持多种 LLM 服务商，你可以根据自己的需求选择：
 
 | 服务商           | 特点                    | 推荐场景     |
 | ---------------- | ----------------------- | ------------ |
@@ -49,7 +49,7 @@ VideoCaptioner 支持多种 LLM 服务商，你可以根据自己的需求选择
 
 1. **注册账号**
 
-   访问 [SiliconCloud](https://cloud.siliconflow.cn/i/onCHcaDx) 注册账号（通过链接注册可获得额外额度）
+   访问 [SiliconCloud 官网](https://cloud.siliconflow.cn) 注册账号
 
 2. **获取 API Key**
 
@@ -57,9 +57,9 @@ VideoCaptioner 支持多种 LLM 服务商，你可以根据自己的需求选择
 
    ![获取API Key](https://h1.appinn.me/file/get_api.png)
 
-3. **在 VideoCaptioner 中配置**
+3. **在 NovaCaption 中配置**
 
-   打开 VideoCaptioner，进入 **设置 → LLM 配置**：
+   打开 NovaCaption，进入 **设置 → LLM 配置**：
    - **LLM 服务**: 选择 `SiliconCloud`
    - **API Base URL**: `https://api.siliconflow.cn/v1`
    - **API Key**: 粘贴你的 API Key
@@ -83,7 +83,7 @@ VideoCaptioner 支持多种 LLM 服务商，你可以根据自己的需求选择
 
 1. 访问 [OpenAI Platform](https://platform.openai.com) 获取 API Key
 
-2. 在 VideoCaptioner 中配置：
+2. 在 NovaCaption 中配置：
    - **LLM 服务**: 选择 `OpenAI`
    - **API Base URL**: `https://api.openai.com/v1`
    - **API Key**: 你的 OpenAI API Key
@@ -100,7 +100,7 @@ VideoCaptioner 支持多种 LLM 服务商，你可以根据自己的需求选择
 
 1. 访问 [DeepSeek 平台](https://platform.deepseek.com) 注册并获取 API Key
 
-2. 在 VideoCaptioner 中配置：
+2. 在 NovaCaption 中配置：
    - **LLM 服务**: 选择 `DeepSeek`
    - **API Base URL**: `https://api.deepseek.com/v1`
    - **API Key**: 你的 DeepSeek API Key
@@ -109,58 +109,7 @@ VideoCaptioner 支持多种 LLM 服务商，你可以根据自己的需求选择
 3. **线程数配置**：
    - 建议 5-10 个线程
 
-### 方式四：使用本项目中转站（推荐）⭐
-
-本项目提供了高性价比的 LLM API 中转站，支持多种优质模型和高并发。
-
-**特点：**
-
-- ✅ 支持 OpenAI、Claude、Gemini 等优质模型
-- ✅ 超高并发能力，处理速度极快
-- ✅ 稳定可靠，专为本项目优化
-- ✅ 国内可直接访问
-
-**配置步骤：**
-
-1. **注册账号**
-
-   访问 [https://api.videocaptioner.cn/register](https://api.videocaptioner.cn/register?aff=UrLB) 注册（通过链接注册赠送 $0.4 测试余额）
-
-2. **获取 API Key**
-
-   登录后访问 [Token 页面](https://api.videocaptioner.cn/token) 获取 API Key
-
-3. **在 VideoCaptioner 中配置**
-   - **LLM 服务**: 选择 `OpenAI`（兼容模式）
-   - **API Base URL**: `https://api.videocaptioner.cn/v1`
-   - **API Key**: 你获取的 API Key
-   - 点击 **"检查连接"** 测试
-
-   ![中转站配置](/api-setting-2.png)
-
-4. **模型选择建议**
-
-   根据预算和质量需求选择：
-
-   | 质量层级     | 推荐模型                                               | 耗费比例 | 适用场景             |
-   | ------------ | ------------------------------------------------------ | -------- | -------------------- |
-   | **高质量**   | `gemini-2.0-flash-exp`<br>`claude-sonnet-4.5-20250929` | 3        | 重要内容、专业翻译   |
-   | **较高质量** | `gpt-4o-2024-08-07`<br>`claude-haiku-4-5-20251001`     | 1.2      | 日常使用、高质量需求 |
-   | **中质量**   | `gpt-4o-mini`<br>`gemini-2.0-flash-exp`                | 0.3      | 快速处理、预算有限   |
-
-5. **线程数配置**
-
-   中转站支持超高并发，可以直接拉满：
-   - **线程数**: 20-50（根据你的网络和机器性能）
-
-::: tip 推荐配置
-
-- **日常使用**: `gpt-4o-mini` + 30 线程
-- **追求质量**: `claude-sonnet-4.5` + 20 线程
-- **预算有限**: `gemini-2.0-flash-exp` + 50 线程
-  :::
-
-### 方式五：本地部署 Ollama
+### 方式四：本地部署 Ollama
 
 如果你希望完全本地运行，保护隐私：
 
@@ -184,7 +133,7 @@ VideoCaptioner 支持多种 LLM 服务商，你可以根据自己的需求选择
    ollama serve
    ```
 
-4. **在 VideoCaptioner 中配置**
+4. **在 NovaCaption 中配置**
    - **LLM 服务**: 选择 `Ollama`
    - **API Base URL**: `http://localhost:11434/v1`
    - **API Key**: 留空或填写任意值
@@ -361,4 +310,4 @@ VideoCaptioner 支持多种 LLM 服务商，你可以根据自己的需求选择
 
 ---
 
-如果还有其他问题，欢迎在 [GitHub Issues](https://github.com/WEIFENG2333/VideoCaptioner/issues) 提问。
+如果还有其他问题，欢迎在 [GitHub Issues](https://github.com/yu-hou/VideoCaptioner-customize/issues) 提问。

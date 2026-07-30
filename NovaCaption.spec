@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller build recipe for the VideoCaptioner desktop bundle."""
+"""PyInstaller build recipe for the NovaCaption desktop bundle."""
 
 import os
 import sys
@@ -11,6 +11,9 @@ block_cipher = None
 
 ROOT = Path(SPECPATH)
 RUNTIME_DIR = Path(os.environ.get("VIDEOCAPTIONER_DESKTOP_RUNTIME_DIR", ROOT / "build" / "desktop-runtime"))
+APP_ICON = ROOT / "resource" / "assets" / (
+    "novacaption.icns" if sys.platform == "darwin" else "novacaption.ico"
+)
 
 
 def _data(src: Path, dest: str):
@@ -23,6 +26,8 @@ datas = [
     _data(ROOT / "resource" / "subtitle_style", "resource/subtitle_style"),
     _data(ROOT / "resource" / "translations", "resource/translations"),
     _data(ROOT / "videocaptioner" / "core" / "prompts", "videocaptioner/core/prompts"),
+    _data(ROOT / "LICENSE", "."),
+    _data(ROOT / "NOTICE.md", "."),
 ]
 
 runtime_bin = RUNTIME_DIR / "resource" / "bin"
@@ -94,7 +99,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="VideoCaptioner",
+    name="NovaCaption",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -105,6 +110,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=str(APP_ICON),
 )
 
 coll = COLLECT(
@@ -115,17 +121,18 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="VideoCaptioner",
+    name="NovaCaption",
 )
 
 if sys.platform == "darwin":
     app = BUNDLE(
         coll,
-        name="VideoCaptioner.app",
-        bundle_identifier="com.weifeng.videocaptioner",
+        name="NovaCaption.app",
+        bundle_identifier="com.yuhou.novacaption",
+        icon=str(ROOT / "resource" / "assets" / "novacaption.icns"),
         info_plist={
-            "CFBundleName": "VideoCaptioner",
-            "CFBundleDisplayName": "VideoCaptioner",
+            "CFBundleName": "NovaCaption",
+            "CFBundleDisplayName": "NovaCaption",
             "NSHighResolutionCapable": True,
         },
     )

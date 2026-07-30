@@ -32,7 +32,7 @@ def main():
     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
 
     # Logger + global exception hook
-    logger = setup_logger("VideoCaptioner")
+    logger = setup_logger("NovaCaption")
 
     def exception_hook(exctype, value, tb):
         logger.error("".join(traceback.format_exception(exctype, value, tb)))

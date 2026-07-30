@@ -24,7 +24,7 @@ from qfluentwidgets import (
     ToolButton,
 )
 
-from videocaptioner.config import APPDATA_PATH, ASSETS_PATH, VERSION
+from videocaptioner.config import APP_NAME, APPDATA_PATH, ASSETS_PATH, VERSION
 from videocaptioner.core.constant import (
     INFOBAR_DURATION_ERROR,
     INFOBAR_DURATION_INFO,
@@ -36,7 +36,6 @@ from videocaptioner.core.entities import (
     SupportedVideoFormats,
 )
 from videocaptioner.ui.common.config import cfg
-from videocaptioner.ui.components.DonateDialog import DonateDialog
 from videocaptioner.ui.thread.video_download_thread import VideoDownloadThread
 from videocaptioner.ui.view.log_window import LogWindow
 
@@ -174,23 +173,8 @@ class TaskCreationInterface(QWidget):
         """
         )
 
-        # 创建捐助按钮
-        self.donate_button = HyperlinkButton(url="", text=self.tr("捐助"), parent=self)
-        self.donate_button.setStyleSheet(
-            self.donate_button.styleSheet()
-            + """
-            QPushButton {
-                font-size: 12px;
-                color: #2F8D63;
-                text-decoration: underline;
-            }
-        """
-        )
-
         # 添加版权信息标签
-        self.info_label = BodyLabel(
-            self.tr(f"©VideoCaptioner {VERSION} • By Weifeng"), self
-        )
+        self.info_label = BodyLabel(f"{APP_NAME} {VERSION} · GPL-3.0", self)
         self.info_label.setAlignment(Qt.AlignCenter)  # type: ignore
         self.info_label.setStyleSheet("font-size: 12px; color: #888888;")
 
@@ -198,7 +182,6 @@ class TaskCreationInterface(QWidget):
         bottom_layout.addStretch()
         bottom_layout.addWidget(self.info_label)
         bottom_layout.addWidget(self.log_button)
-        bottom_layout.addWidget(self.donate_button)
         bottom_layout.addStretch()
 
         self.main_layout.addStretch()
@@ -208,7 +191,6 @@ class TaskCreationInterface(QWidget):
         self.start_button.clicked.connect(self.on_start_clicked)
         self.search_input.textChanged.connect(self.on_search_input_changed)
         self.log_button.clicked.connect(self.show_log_window)
-        self.donate_button.clicked.connect(self.show_donate_dialog)
 
     def setup_values(self):
         self.search_input.setText("")
@@ -388,12 +370,6 @@ class TaskCreationInterface(QWidget):
             self.log_window.show()
         else:
             self.log_window.activateWindow()
-
-    def show_donate_dialog(self):
-        """显示捐助窗口"""
-        donate_dialog = DonateDialog(self)
-        donate_dialog.exec_()
-
 
 if __name__ == "__main__":
     QApplication.setHighDpiScaleFactorRoundingPolicy(

@@ -1,22 +1,22 @@
 ---
 layout: home
-title: VideoCaptioner - AI Video Subtitle Tool | Free & Open Source
+title: NovaCaption - AI Video Subtitle Tool | Free & Open Source
 titleTemplate: false
 description: Free and open-source AI-powered video subtitle tool. Supports Whisper speech recognition, LLM intelligent segmentation, subtitle optimization, and 99-language translation. Perfect for YouTube, Bilibili, and more.
 
 head:
   - - meta
     - name: keywords
-      content: VideoCaptioner,video subtitle generator,AI automatic subtitles,Whisper subtitles,LLM subtitle translation,free subtitle tool,open source caption software,video transcription,speech to text,subtitle maker,YouTube subtitle tool,multilingual subtitles,automatic caption generator,subtitle editing software,video captioning,AI subtitle creator,subtitle optimization,video to text converter
+      content: NovaCaption,video subtitle generator,AI automatic subtitles,Whisper subtitles,LLM subtitle translation,free subtitle tool,open source caption software,video transcription,speech to text,subtitle maker,YouTube subtitle tool,multilingual subtitles,automatic caption generator,subtitle editing software,video captioning,AI subtitle creator,subtitle optimization,video to text converter
   - - meta
     - property: og:title
-      content: VideoCaptioner - AI Video Subtitle Tool | Free & Open Source
+      content: NovaCaption - AI Video Subtitle Tool | Free & Open Source
   - - meta
     - property: og:description
       content: Free & open-source AI subtitle tool powered by Whisper & LLM. Supports 99 languages with intelligent segmentation, professional translation, and one-click processing. Perfect for content creators on YouTube, Bilibili, and other platforms.
   - - meta
     - property: og:url
-      content: https://weifeng2333.github.io/VideoCaptioner/en/
+      content: https://yu-hou.github.io/VideoCaptioner-customize/en/
   - - meta
     - property: og:locale
       content: en_US
@@ -31,25 +31,25 @@ head:
       content: 2025-01-25T00:00:00Z
   - - meta
     - name: twitter:title
-      content: VideoCaptioner - AI Video Subtitle Tool | Free & Open Source
+      content: NovaCaption - AI Video Subtitle Tool | Free & Open Source
   - - meta
     - name: twitter:description
       content: Free AI-powered subtitle tool with Whisper & LLM. Supports 99 languages, intelligent segmentation, and professional translation. Perfect for content creators.
 
 hero:
-  name: VideoCaptioner
+  name: NovaCaption
   text: Professional Video Subtitle Processing
   tagline: Open Source · LLM-Powered · Process 14-minute video in 4 minutes, cost less than $0.002
   image:
     src: /logo.png
-    alt: VideoCaptioner
+    alt: NovaCaption
   actions:
     - theme: brand
       text: Get Started
       link: /en/guide/getting-started
     - theme: alt
       text: GitHub Repository
-      link: https://github.com/WEIFENG2333/VideoCaptioner
+      link: https://github.com/yu-hou/VideoCaptioner-customize
 
 features:
   - icon: ⚡
@@ -66,7 +66,7 @@ features:
 
   - icon: 📖
     title: Fully Open Source & Free
-    details: MIT license, no hidden fees. Run locally for complete data privacy control. Community-driven continuous improvement.
+    details: GPL-3.0 licensed, no hidden fees. Run locally for complete data privacy control. Community-driven continuous improvement.
 
   - icon: 💻
     title: No High-End Hardware
@@ -102,22 +102,22 @@ features:
 ```bash [Windows]
 # Download and run the installer directly
 # Or run from source
-git clone https://github.com/WEIFENG2333/VideoCaptioner.git
-cd VideoCaptioner
+git clone https://github.com/yu-hou/VideoCaptioner-customize.git
+cd NovaCaption
 run.bat
 ```
 
 ```bash [macOS/Linux]
 # Use automatic installation script
-git clone https://github.com/WEIFENG2333/VideoCaptioner.git
-cd VideoCaptioner
+git clone https://github.com/yu-hou/VideoCaptioner-customize.git
+cd NovaCaption
 chmod +x run.sh
 ./run.sh
 ```
 
 :::
 
-## Why Choose VideoCaptioner?
+## Why Choose NovaCaption?
 
 - **🎯 Efficient Processing**: Full processing of a 14-minute video takes only about 4 minutes, costing less than ¥0.01
 - **🌟 Quality Assurance**: Uses advanced Whisper models and large language models to ensure subtitle quality
@@ -156,7 +156,7 @@ chmod +x run.sh
 
 ## Get Started
 
-Ready to begin? Check out the [Getting Started Guide](/en/guide/getting-started) to learn how to use VideoCaptioner.
+Ready to begin? Check out the [Getting Started Guide](/en/guide/getting-started) to learn how to use NovaCaption.
 
 <style>
 :root {

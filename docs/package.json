@@ -1,7 +1,7 @@
 {
   "name": "videocaptioner-docs",
   "version": "1.4.0",
-  "description": "Documentation site for VideoCaptioner",
+  "description": "Documentation site for NovaCaption",
   "private": true,
   "scripts": {
     "docs:dev": "vitepress dev",

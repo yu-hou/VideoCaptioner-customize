@@ -1,10 +1,14 @@
 <div align="center">
-  <img src="./docs/images/logo.png" alt="VideoCaptioner Logo" width="100">
-  <h1>VideoCaptioner</h1>
+  <img src="./docs/images/logo.png" alt="NovaCaption Logo" width="100">
+  <h1>NovaCaption</h1>
   <p>基于大语言模型的视频字幕处理工具 — 语音识别、字幕优化、翻译、视频合成一站式处理</p>
 
-  [在线文档](https://weifeng2333.github.io/VideoCaptioner/) · [CLI 使用](#cli-命令行) · [GUI 桌面版](#gui-桌面版) · [Claude Code Skill](#claude-code-skill)
+  [项目主页](https://github.com/yu-hou/VideoCaptioner-customize) · [反馈](https://github.com/yu-hou/VideoCaptioner-customize/issues) · [Release](https://github.com/yu-hou/VideoCaptioner-customize/releases) · [CLI 使用](#cli-命令行)
 </div>
+
+> [!IMPORTANT]
+> NovaCaption 是基于 [WEIFENG2333/VideoCaptioner](https://github.com/WEIFENG2333/VideoCaptioner)
+> 的独立定制版本，并非上游作者发布、授权或认可的官方商业版本。
 
 ## 安装
 
@@ -73,11 +77,14 @@ videocaptioner                      # 无参数时也会打开桌面版
 <details>
 <summary>其他安装方式：Windows 安装包 / macOS 一键脚本</summary>
 
-**Windows**：从 [Release](https://github.com/WEIFENG2333/VideoCaptioner/releases) 下载安装包
+**Windows / macOS**：从 [NovaCaption Release](https://github.com/yu-hou/VideoCaptioner-customize/releases) 下载对应安装包。
 
-**macOS**：
+**从源码运行**：
 ```bash
-curl -fsSL https://raw.githubusercontent.com/WEIFENG2333/VideoCaptioner/master/scripts/run.sh | bash
+git clone https://github.com/yu-hou/VideoCaptioner-customize.git
+cd VideoCaptioner-customize
+uv sync
+uv run videocaptioner
 ```
 
 </details>
@@ -98,15 +105,14 @@ LLM 仅用于字幕优化和大模型翻译，免费功能（必剪识别、必�
 
 | 服务商 | 官网 |
 |--------|------|
-| **VideoCaptioner 中转站** | [api.videocaptioner.cn](https://api.videocaptioner.cn) — 高并发，性价比高，支持 GPT/Claude/Gemini 等 |
-| SiliconCloud | [cloud.siliconflow.cn](https://cloud.siliconflow.cn/i/HF95kaoz) |
+| SiliconCloud | [cloud.siliconflow.cn](https://cloud.siliconflow.cn) |
 | DeepSeek | [platform.deepseek.com](https://platform.deepseek.com) |
 
-在软件设置或 CLI 中填入 API Base URL 和 API Key 即可。[详细配置教程](https://weifeng2333.github.io/VideoCaptioner/config/llm)
+在软件设置或 CLI 中填入所选服务商提供的 API Base URL 和 API Key 即可。
 
 ## Claude Code Skill
 
-本项目提供了 [Claude Code Skill](https://code.claude.com/docs/en/skills.md)，让 AI 编程助手可以直接调用 VideoCaptioner 处理视频。
+本项目提供了 [Claude Code Skill](https://code.claude.com/docs/en/skills.md)，让 AI 编程助手可以直接调用 NovaCaption 处理视频。
 
 安装到 Claude Code：
 
@@ -131,8 +137,8 @@ cp skills/SKILL.md ~/.claude/skills/videocaptioner/SKILL.md
 ## 开发
 
 ```bash
-git clone https://github.com/WEIFENG2333/VideoCaptioner.git
-cd VideoCaptioner
+git clone https://github.com/yu-hou/VideoCaptioner-customize.git
+cd VideoCaptioner-customize
 uv sync && uv run videocaptioner     # 运行 GUI
 uv run videocaptioner --help          # 运行 CLI
 uv run pyright                        # 类型检查
@@ -141,6 +147,4 @@ uv run pytest tests/test_cli/ -q      # 运行测试
 
 ## 许可证
 
-[GPL-3.0](LICENSE)
-
-[![Star History Chart](https://api.star-history.com/svg?repos=WEIFENG2333/VideoCaptioner&type=Date)](https://star-history.com/#WEIFENG2333/VideoCaptioner&Date)
+[GPL-3.0](LICENSE)。上游归属及非官方发行声明见 [NOTICE.md](NOTICE.md)。

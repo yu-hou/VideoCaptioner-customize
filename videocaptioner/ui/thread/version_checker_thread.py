@@ -5,7 +5,7 @@ from datetime import datetime
 import requests
 from PyQt5.QtCore import QObject, QVersionNumber, pyqtSignal
 
-from videocaptioner.config import VERSION
+from videocaptioner.config import GITHUB_REPO_URL, RELEASE_URL, VERSION
 from videocaptioner.core.utils.cache import get_version_state_cache
 from videocaptioner.core.utils.logger import setup_logger
 
@@ -32,36 +32,27 @@ class VersionChecker(QObject):
 
     def get_latest_version_info(self) -> dict:
         """Get latest version information"""
-        url = "https://vc.bkfeng.top/api/version"
-        headers = {"app_version": VERSION}
+        url = "https://api.github.com/repos/yu-hou/VideoCaptioner-customize/releases/latest"
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "User-Agent": f"NovaCaption/{VERSION}",
+        }
 
         try:
             response = requests.get(url, timeout=10, headers=headers)
             response.raise_for_status()
-            data = response.json()
-            # data = {
-            #     "latest_version": "v1.4.0",
-            #     "update_required": True,
-            #     "update_info": "更新内容",
-            #     "download_url": "https://github.com/WEIFENG2333/VideoCaptioner/releases/latest",
-            #     "announcement": {
-            #         "enabled": True,
-            #         "content": "公告内容211",
-            #         "start_date": "2025-01-01",
-            #         "end_date": "2025-12-30",
-            #     },
-            # }
-
-            self.latest_version = data.get("latest_version", self.current_version)
-            self.update_required = data.get("update_required", False)
-            self.update_info = data.get("update_info", "")
-            self.download_url = data.get("download_url", "")
-            self.announcement = data.get("announcement", {})
+            release = response.json()
+            self.latest_version = release.get("tag_name", self.current_version)
+            self.update_required = False
+            self.update_info = release.get("body") or ""
+            self.download_url = release.get("html_url") or RELEASE_URL
+            self.announcement = {}
 
             logger.info("Successfully fetched version info: %s", self.latest_version)
-            return data
+            return release
 
         except requests.RequestException:
+            logger.info("No NovaCaption release information available at %s", GITHUB_REPO_URL)
             return {}
 
     def has_new_version(self) -> bool:
@@ -140,7 +131,7 @@ class VersionChecker(QObject):
             self.cache.set(version_key, True)
 
             update_announcement = (
-                f"Welcome to VideoCaptioner {self.current_version}\n\n"
+                f"Welcome to NovaCaption {self.current_version}\n\n"
                 f"What's new:\n{self.update_info}"
             )
             self.announcementAvailable.emit(update_announcement)

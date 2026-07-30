@@ -2,7 +2,7 @@
 
 Date: 2026-05-24
 
-This note records the current API surface and local connectivity tests for adding SiliconFlow and Gemini text/TTS providers to VideoCaptioner. API keys used during testing are intentionally omitted.
+This note records the current API surface and local connectivity tests for adding SiliconFlow and Gemini text/TTS providers to NovaCaption. API keys used during testing are intentionally omitted.
 
 ## Summary
 
@@ -205,7 +205,7 @@ Local clone-chain test:
 }
 ```
 
-VideoCaptioner already has a partial implementation in `videocaptioner/core/tts/siliconflow.py`:
+NovaCaption already has a partial implementation in `videocaptioner/core/tts/siliconflow.py`:
 
 | Existing behavior | Status |
 | --- | --- |
@@ -368,7 +368,7 @@ Local TTS test:
 
 ## Integration Notes
 
-### SiliconFlow in VideoCaptioner
+### SiliconFlow in NovaCaption
 
 SiliconFlow text models can already fit the existing OpenAI-compatible LLM client by setting:
 
@@ -396,12 +396,12 @@ The existing `SiliconFlowTTS` implementation should be kept, with follow-up work
 | Dynamic reference mode | Useful for one-off clone without saving URI |
 | Speed/gain/sample rate controls | Already supported by API and `TTSConfig` |
 
-### Gemini in VideoCaptioner
+### Gemini in NovaCaption
 
 Gemini is not directly compatible with the current `OpenAI` client path used by `videocaptioner/core/llm/client.py`. It needs either:
 
 1. a Gemini-native LLM client using `generateContent`, or
-2. a provider adapter that maps VideoCaptioner messages/config into Gemini REST calls.
+2. a provider adapter that maps NovaCaption messages/config into Gemini REST calls.
 
 Gemini TTS needs a new TTS implementation because it returns base64 PCM inside JSON, not raw audio bytes from an OpenAI-compatible `/audio/speech` endpoint.
 

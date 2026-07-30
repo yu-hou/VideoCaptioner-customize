@@ -23,14 +23,14 @@ def _find_executable(bundle: Path) -> Path:
         return bundle
     candidates = []
     if platform.system() == "Windows":
-        candidates.append(bundle / "VideoCaptioner.exe")
+        candidates.append(bundle / "NovaCaption.exe")
     else:
-        candidates.append(bundle / "VideoCaptioner")
-        candidates.append(bundle / "VideoCaptioner.app" / "Contents" / "MacOS" / "VideoCaptioner")
+        candidates.append(bundle / "NovaCaption")
+        candidates.append(bundle / "NovaCaption.app" / "Contents" / "MacOS" / "NovaCaption")
     for candidate in candidates:
         if candidate.exists():
             return candidate
-    raise FileNotFoundError(f"VideoCaptioner executable not found under {bundle}")
+    raise FileNotFoundError(f"NovaCaption executable not found under {bundle}")
 
 
 def _find_bundled_tool(bundle: Path, name: str) -> Path:
@@ -38,8 +38,8 @@ def _find_bundled_tool(bundle: Path, name: str) -> Path:
     candidates = [
         bundle / "_internal" / "resource" / "bin" / exe_name,
         bundle / "resource" / "bin" / exe_name,
-        bundle / "VideoCaptioner.app" / "Contents" / "Frameworks" / "resource" / "bin" / exe_name,
-        bundle / "VideoCaptioner.app" / "Contents" / "Resources" / "resource" / "bin" / exe_name,
+        bundle / "NovaCaption.app" / "Contents" / "Frameworks" / "resource" / "bin" / exe_name,
+        bundle / "NovaCaption.app" / "Contents" / "Resources" / "resource" / "bin" / exe_name,
     ]
     for candidate in candidates:
         if candidate.exists():
@@ -54,7 +54,7 @@ def _write_sample_srt(path: Path) -> None:
     path.write_text(
         "1\n"
         "00:00:00,100 --> 00:00:01,400\n"
-        "Hello from VideoCaptioner.\n\n"
+        "Hello from NovaCaption.\n\n"
         "2\n"
         "00:00:01,500 --> 00:00:02,600\n"
         "这是一条真实合成测试字幕。\n",
@@ -107,7 +107,7 @@ def _duration(ffprobe: Path, media: Path) -> float:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("bundle", help="Path to dist/VideoCaptioner or an executable")
+    parser.add_argument("bundle", help="Path to dist/NovaCaption or an executable")
     args = parser.parse_args()
 
     bundle = Path(args.bundle).resolve()

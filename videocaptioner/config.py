@@ -11,13 +11,15 @@ try:
 except Exception:
     VERSION = "0.0.0-dev"
 YEAR = 2026
-APP_NAME = "VideoCaptioner"
-AUTHOR = "Weifeng"
+APP_NAME = "NovaCaption"
+APP_DISPLAY_NAME = "NovaCaption — 智能字幕工作台"
+AUTHOR = "NovaCaption Contributors"
 
-HELP_URL = "https://github.com/WEIFENG2333/VideoCaptioner"
-GITHUB_REPO_URL = "https://github.com/WEIFENG2333/VideoCaptioner"
-RELEASE_URL = "https://github.com/WEIFENG2333/VideoCaptioner/releases/latest"
-FEEDBACK_URL = "https://github.com/WEIFENG2333/VideoCaptioner/issues"
+GITHUB_REPO_URL = "https://github.com/yu-hou/VideoCaptioner-customize"
+HELP_URL = GITHUB_REPO_URL
+RELEASE_URL = f"{GITHUB_REPO_URL}/releases/latest"
+FEEDBACK_URL = f"{GITHUB_REPO_URL}/issues"
+UPSTREAM_PROJECT_URL = "https://github.com/WEIFENG2333/VideoCaptioner"
 
 # Detect whether running from source tree or pip-installed
 _PACKAGE_DIR = Path(__file__).parent

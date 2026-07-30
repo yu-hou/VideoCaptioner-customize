@@ -7,7 +7,7 @@ on:
       - "resource/**"
       - "scripts/build_desktop.py"
       - "scripts/smoke_desktop.py"
-      - "VideoCaptioner.spec"
+      - "NovaCaption.spec"
       - "pyproject.toml"
       - "uv.lock"
       - ".github/workflows/build-desktop.yml"
@@ -60,12 +60,12 @@ jobs:
         run: uv run --with pyinstaller --with static-ffmpeg python scripts/build_desktop.py --clean
 
       - name: Smoke test packaged app
-        run: uv run python scripts/smoke_desktop.py dist/VideoCaptioner
+        run: uv run python scripts/smoke_desktop.py dist/NovaCaption
 
       - name: Upload desktop artifact
         uses: actions/upload-artifact@v7
         with:
-          name: desktop-${{ runner.os }}
+          name: novacaption-${{ runner.os }}
           path: artifacts/*.zip
           if-no-files-found: error
           retention-days: 14

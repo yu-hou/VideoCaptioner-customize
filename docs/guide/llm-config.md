@@ -4,7 +4,7 @@
 
 ## 为什么需要配置 LLM？
 
-VideoCaptioner 使用 LLM 提供以下核心功能：
+NovaCaption 使用 LLM 提供以下核心功能：
 
 - **智能断句** - 根据语义自动分割字幕，而不是简单按时长切割
 - **字幕优化** - 纠正语音识别的错误，统一专业术语
@@ -27,7 +27,7 @@ VideoCaptioner 使用 LLM 提供以下核心功能：
 
 ### 使用 SiliconCloud
 
-[SiliconCloud](https://cloud.siliconflow.cn/i/onCHcaDx) 集成了国内多家大模型厂商，注册即送测试额度。
+[SiliconCloud](https://cloud.siliconflow.cn) 提供多种大模型 API。
 
 #### 1. 注册并获取 API Key
 
@@ -37,7 +37,7 @@ VideoCaptioner 使用 LLM 提供以下核心功能：
 
 #### 2. 在软件中配置
 
-打开 VideoCaptioner，进入 **设置 → LLM 服务配置**
+打开 NovaCaption，进入 **设置 → LLM 服务配置**
 
 填写以下信息：
 
@@ -62,54 +62,6 @@ SiliconCloud 对并发请求有限制，建议将 **线程数** 设置为 **5 �
 
 :::info 实名要求
 自 2025 年 2 月 6 日起，DeepSeek-V3 模型要求实名认证才能获得更多调用次数。未实名用户每日最多请求 100 次。
-:::
-
----
-
-## OpenAI 官方或中转站
-
-### 使用项目推荐的中转站
-
-如果你需要使用 OpenAI、Claude 或 Gemini 模型，可以使用中转服务。
-
-#### 1. 注册账号
-
-访问 [本项目的中转站](https://api.videocaptioner.cn/register?aff=UrLB)，通过此链接注册默认赠送 **$0.4** 测试余额。
-
-#### 2. 获取 API Key
-
-登录后访问 [https://api.videocaptioner.cn/token](https://api.videocaptioner.cn/token) 获取你的 API Key
-
-#### 3. 在软件中配置
-
-打开 VideoCaptioner，进入 **设置 → LLM 服务配置**
-
-填写以下信息：
-
-| 配置项           | 值                                 |
-| ---------------- | ---------------------------------- |
-| **API 接口地址** | `https://api.videocaptioner.cn/v1` |
-| **API Key**      | 粘贴你获取的密钥                   |
-| **模型**         | 见下方推荐                         |
-
-![中转站配置示例](https://h1.appinn.me/file/1731487405884_api-setting-2.png)
-
-#### 4. 模型选择建议
-
-根据质量和成本需求选择：
-
-| 质量层级        | 推荐模型                              | 成本比例 | 适用场景               |
-| --------------- | ------------------------------------- | -------- | ---------------------- |
-| 🏆 **高质量**   | `claude-3-5-sonnet-20241022`          | 3        | 专业内容、重要视频     |
-| ⭐ **较高质量** | `gemini-2.0-flash`<br>`deepseek-chat` | 1        | 日常使用、质量要求较高 |
-| 💰 **性价比**   | `gpt-4o-mini`<br>`gemini-1.5-flash`   | 0.15     | 大量视频、成本敏感     |
-
-:::tip 性能优势
-本中转站支持超高并发，软件中 **线程数可以拉满**，处理速度非常快！
-:::
-
-:::info 成本建议
-如果条件有限，直接使用 `gpt-4o-mini` 即可。这个模型便宜且速度快，处理一个视频只需几分钱，**建议不要折腾本地部署了**。
 :::
 
 ---

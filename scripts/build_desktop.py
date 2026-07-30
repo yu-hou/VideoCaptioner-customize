@@ -14,11 +14,12 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SPEC_FILE = ROOT / "VideoCaptioner.spec"
+SPEC_FILE = ROOT / "NovaCaption.spec"
 BUILD_DIR = ROOT / "build"
 DIST_DIR = ROOT / "dist"
 ARTIFACT_DIR = ROOT / "artifacts"
 RUNTIME_DIR = BUILD_DIR / "desktop-runtime"
+PRODUCT_NAME = "NovaCaption"
 
 
 def _run(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
@@ -133,11 +134,11 @@ def _archive_dir(source: Path, archive: Path) -> None:
 
 
 def verify_bundle() -> None:
-    bundle = DIST_DIR / "VideoCaptioner"
+    bundle = DIST_DIR / PRODUCT_NAME
     if platform.system() == "Windows":
-        exe = bundle / "VideoCaptioner.exe"
+        exe = bundle / f"{PRODUCT_NAME}.exe"
     else:
-        exe = bundle / "VideoCaptioner"
+        exe = bundle / PRODUCT_NAME
     if not exe.exists():
         raise RuntimeError(f"Executable not found: {exe}")
 
@@ -156,12 +157,12 @@ def verify_bundle() -> None:
 
 
 def archive(version: str) -> None:
-    bundle = DIST_DIR / "VideoCaptioner"
+    bundle = DIST_DIR / PRODUCT_NAME
     tag = _platform_tag()
-    _archive_dir(bundle, ARTIFACT_DIR / f"VideoCaptioner-{version}-{tag}.zip")
-    app = DIST_DIR / "VideoCaptioner.app"
+    _archive_dir(bundle, ARTIFACT_DIR / f"{PRODUCT_NAME}-{version}-{tag}.zip")
+    app = DIST_DIR / f"{PRODUCT_NAME}.app"
     if app.exists():
-        _archive_dir(app, ARTIFACT_DIR / f"VideoCaptioner-{version}-{tag}-app.zip")
+        _archive_dir(app, ARTIFACT_DIR / f"{PRODUCT_NAME}-{version}-{tag}-app.zip")
 
 
 def main() -> int:

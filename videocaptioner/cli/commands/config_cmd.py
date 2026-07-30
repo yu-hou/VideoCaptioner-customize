@@ -122,7 +122,7 @@ def _interactive_init(args: Namespace, config_data: dict) -> int:
             output.hint("Non-interactive mode detected. Use 'videocaptioner config init --non-interactive'.")
             raise
 
-    print("VideoCaptioner Onboarding")
+    print("NovaCaption Onboarding")
     print("=" * 40)
     print()
     print("Press Enter to keep the shown default. API keys can be skipped and added later.")
@@ -197,7 +197,7 @@ def _render_onboarding_template(config_data: dict) -> str:
 
     template_data = _user_facing_config(config_data)
     f = StringIO()
-    f.write("# VideoCaptioner configuration\n")
+    f.write("# NovaCaption configuration\n")
     f.write("# Priority: CLI flags > environment variables > this file > built-in defaults.\n")
     f.write("# Keep API keys private. This file is written with 0600 permissions on Unix.\n\n")
     f.write("# [llm] is used for AI subtitle polish, LLM translation, reflective translation, and dubbing length adaptation.\n")

@@ -1,4 +1,4 @@
-# VideoCaptioner CLI
+# NovaCaption CLI
 
 ## 安装
 
@@ -110,7 +110,7 @@ videocaptioner synthesize <视频> -s <字幕> [选项]
 
 #### 字幕样式
 
-VideoCaptioner 支持两种渲染模式，让字幕更美观：
+NovaCaption 支持两种渲染模式，让字幕更美观：
 
 **ASS 模式**（默认）— 传统描边/阴影样式，支持自定义字体、颜色、描边宽度：
 ```bash

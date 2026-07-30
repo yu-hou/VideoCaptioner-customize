@@ -1,10 +1,10 @@
 [project]
 name = "videocaptioner"
 dynamic = ["version"]
-description = "AI-powered video captioning tool — ASR, subtitle optimization, translation, and synthesis"
+description = "NovaCaption — AI-powered video captioning, translation, and synthesis"
 readme = "README.md"
 license = { text = "GPL-3.0" }
-authors = [{ name = "Weifeng" }]
+authors = [{ name = "NovaCaption Contributors" }]
 requires-python = ">=3.10,<3.13"
 keywords = ["video", "caption", "subtitle", "asr", "llm", "translation", "cli"]
 classifiers = [
@@ -45,9 +45,9 @@ dependencies = [
 gui = []
 
 [project.urls]
-Homepage = "https://github.com/WEIFENG2333/VideoCaptioner"
-Repository = "https://github.com/WEIFENG2333/VideoCaptioner"
-Issues = "https://github.com/WEIFENG2333/VideoCaptioner/issues"
+Homepage = "https://github.com/yu-hou/VideoCaptioner-customize"
+Repository = "https://github.com/yu-hou/VideoCaptioner-customize"
+Issues = "https://github.com/yu-hou/VideoCaptioner-customize/issues"
 
 [project.scripts]
 videocaptioner = "videocaptioner.cli.main:main"

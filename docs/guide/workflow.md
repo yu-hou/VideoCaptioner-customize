@@ -1,6 +1,6 @@
 # 工作流程
 
-了解 VideoCaptioner 的完整工作流程。
+了解 NovaCaption 的完整工作流程。
 
 ## 处理流程图
 
