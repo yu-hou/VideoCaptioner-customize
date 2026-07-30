@@ -268,6 +268,15 @@ def load_style(
     if not styles_dir.exists():
         return None
 
+    # The desktop UI stores style identifiers as "ass/default" and
+    # "rounded/default", while the CLI historically expected only "default".
+    # Accept both forms so shared configuration cannot break hard rendering.
+    if "/" in name:
+        namespace, unqualified_name = name.split("/", 1)
+        if namespace in {"ass", "rounded"} and unqualified_name:
+            mode = mode or namespace
+            name = unqualified_name
+
     # Try exact filename: <name>.json
     exact = styles_dir / f"{name}.json"
     if exact.exists():

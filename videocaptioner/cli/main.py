@@ -515,7 +515,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _get_version() -> str:
-    # Read version without importing config.py (avoids side effects)
+    # The generated VCS module is embedded by desktop builds and is more
+    # reliable than editable-install metadata, which can be stale.
+    try:
+        from videocaptioner._version import __version__
+
+        return f"videocaptioner {__version__}"
+    except Exception:
+        pass
+    # Read package metadata without importing config.py (avoids side effects).
     try:
         import importlib.metadata
         return f"videocaptioner {importlib.metadata.version('videocaptioner')}"
