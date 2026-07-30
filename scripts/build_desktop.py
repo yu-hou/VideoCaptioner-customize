@@ -265,15 +265,28 @@ def create_windows_setup(version: str) -> Path:
 
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     iss_file = ROOT / "packaging" / "windows" / "NovaCaption.iss"
-    _run(
-        [
-            str(_find_iscc()),
-            f"/DSourceDir={bundle}",
-            f"/DOutputDir={ARTIFACT_DIR}",
-            f"/DAppVersion={version}",
-            str(iss_file),
-        ]
-    )
+    command = [
+        str(_find_iscc()),
+        f"/DSourceDir={bundle}",
+        f"/DOutputDir={ARTIFACT_DIR}",
+        f"/DAppVersion={version}",
+        str(iss_file),
+    ]
+    try:
+        result = _run(command, capture_output=True, text=True, errors="replace")
+    except subprocess.CalledProcessError as exc:
+        # ISCC output can be emitted well before Python prints its traceback.
+        # Repeat it here so CI failure annotations retain the compiler message.
+        if exc.stdout:
+            print(exc.stdout)
+        if exc.stderr:
+            print(exc.stderr, file=sys.stderr)
+        raise
+    else:
+        if result.stdout:
+            print(result.stdout)
+        if result.stderr:
+            print(result.stderr, file=sys.stderr)
     output = ARTIFACT_DIR / WINDOWS_SETUP_NAME
     if not output.exists():
         raise RuntimeError(f"Windows installer not found: {output}")
