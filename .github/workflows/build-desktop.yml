@@ -74,10 +74,13 @@ jobs:
         if: steps.build.outcome == 'failure'
         shell: pwsh
         run: |
+          $tail = Get-Content build-desktop.log -Tail 120
           "### Desktop build failure" >> $env:GITHUB_STEP_SUMMARY
           '```text' >> $env:GITHUB_STEP_SUMMARY
-          Get-Content build-desktop.log -Tail 120 >> $env:GITHUB_STEP_SUMMARY
+          $tail >> $env:GITHUB_STEP_SUMMARY
           '```' >> $env:GITHUB_STEP_SUMMARY
+          $annotation = (($tail -join "`n").Replace("%", "%25").Replace("`r", "%0D").Replace("`n", "%0A"))
+          Write-Output "::error title=Desktop build failed::$annotation"
           exit 1
 
       - name: Smoke test packaged app
