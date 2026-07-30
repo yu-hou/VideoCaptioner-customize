@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 import sys
 from urllib.parse import urlparse
 
@@ -40,6 +41,7 @@ from videocaptioner.ui.thread.video_download_thread import VideoDownloadThread
 from videocaptioner.ui.view.log_window import LogWindow
 
 LOGO_PATH = ASSETS_PATH / "logo.png"
+URL_PATTERN = re.compile(r"https?://[^\s<>\"'，。；：！？）】》]+")
 
 
 class TaskCreationInterface(QWidget):
@@ -94,12 +96,6 @@ class TaskCreationInterface(QWidget):
         self.search_input.setPlaceholderText(self.tr("请拖拽文件或输入视频URL"))
         self.search_input.setFixedHeight(40)
         self.search_input.setClearButtonEnabled(True)
-        self.search_input.focusOutEvent = lambda e: super(
-            LineEdit, self.search_input
-        ).focusOutEvent(e)
-        self.search_input.paintEvent = lambda e: super(
-            LineEdit, self.search_input
-        ).paintEvent(e)
         self.search_input.setStyleSheet(
             self.search_input.styleSheet()
             + """
@@ -115,6 +111,9 @@ class TaskCreationInterface(QWidget):
 
         """
         )
+        self.paste_button = ToolButton(FluentIcon.PASTE, self)
+        self.paste_button.setFixedSize(40, 40)
+        self.paste_button.setToolTip(self.tr("粘贴链接"))
         self.start_button = ToolButton(FluentIcon.FOLDER, self)
         self.start_button.setFixedSize(40, 40)
         self.start_button.setStyleSheet(
@@ -133,6 +132,7 @@ class TaskCreationInterface(QWidget):
         """
         )
         self.search_layout.addWidget(self.search_input)
+        self.search_layout.addWidget(self.paste_button)
         self.search_layout.addWidget(self.start_button)
         self.search_layout.setSpacing(10)
         self.main_layout.addLayout(self.search_layout)
@@ -189,11 +189,30 @@ class TaskCreationInterface(QWidget):
 
     def setup_signals(self):
         self.start_button.clicked.connect(self.on_start_clicked)
+        self.paste_button.clicked.connect(self.paste_from_clipboard)
         self.search_input.textChanged.connect(self.on_search_input_changed)
         self.log_button.clicked.connect(self.show_log_window)
 
     def setup_values(self):
         self.search_input.setText("")
+
+    @staticmethod
+    def normalize_user_input(value: str) -> str:
+        """Trim copied text and extract the first URL from share messages."""
+        value = value.strip()
+        match = URL_PATTERN.search(value)
+        if match:
+            return match.group(0).rstrip(".,;:!?)]}，。；：！？）】》")
+        return value
+
+    def paste_from_clipboard(self):
+        clipboard = QApplication.clipboard()
+        if clipboard is None:
+            return
+        value = self.normalize_user_input(clipboard.text())
+        if value:
+            self.search_input.setText(value)
+            self.search_input.setFocus()
 
     def on_start_clicked(self):
         if self.start_button._icon == FluentIcon.FOLDER:
@@ -258,7 +277,8 @@ class TaskCreationInterface(QWidget):
                 )
 
     def create_task(self):
-        search_input = self.search_input.text()
+        search_input = self.normalize_user_input(self.search_input.text())
+        self.search_input.setText(search_input)
         if os.path.isfile(search_input):
             self._process_file(search_input)
         elif self._is_valid_url(search_input):
@@ -348,7 +368,8 @@ class TaskCreationInterface(QWidget):
             self.search_input.setText(self.task.file_path)
 
     def process(self):
-        search_input = self.search_input.text()
+        search_input = self.normalize_user_input(self.search_input.text())
+        self.search_input.setText(search_input)
 
         if os.path.isfile(search_input):
             self._process_file(search_input)

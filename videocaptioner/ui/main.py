@@ -8,7 +8,7 @@ import sys
 def main():
     import traceback
 
-    from PyQt5.QtCore import Qt, QTranslator
+    from PyQt5.QtCore import QEvent, QObject, Qt, QTranslator
     from PyQt5.QtWidgets import QApplication
 
     from videocaptioner.config import TRANSLATIONS_PATH
@@ -59,6 +59,27 @@ def main():
 
     app = QApplication(sys.argv)
     app.setAttribute(Qt.AA_DontCreateNativeWidgetSiblings, True)  # type: ignore
+
+    # On macOS, Qt maps Command to ControlModifier and the physical Control
+    # key to MetaModifier. Users coming from Windows commonly press Ctrl+V;
+    # make that alternate shortcut paste as well instead of inserting "v".
+    if platform.system() == "Darwin":
+        class MacPasteCompatibilityFilter(QObject):
+            def eventFilter(self, watched, event):
+                if (
+                    event.type() == QEvent.KeyPress
+                    and event.key() == Qt.Key_V
+                    and event.modifiers() == Qt.MetaModifier
+                ):
+                    focused = QApplication.focusWidget()
+                    paste = getattr(focused, "paste", None)
+                    if callable(paste) and focused.isEnabled():
+                        paste()
+                        return True
+                return super().eventFilter(watched, event)
+
+        app.macPasteCompatibilityFilter = MacPasteCompatibilityFilter(app)
+        app.installEventFilter(app.macPasteCompatibilityFilter)
 
     # i18n
     locale = cfg.get(cfg.language).value

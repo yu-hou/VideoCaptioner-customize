@@ -30,6 +30,48 @@ def _run(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
 
 
 def _version() -> str:
+    # Editable uv environments can retain stale importlib metadata and a stale
+    # generated _version.py. Derive desktop build versions from Git first.
+    if (ROOT / ".git").exists():
+        try:
+            tag = subprocess.run(
+                [
+                    "git",
+                    "describe",
+                    "--tags",
+                    "--match",
+                    "v[0-9]*",
+                    "--abbrev=0",
+                ],
+                cwd=str(ROOT),
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+            commit_count = int(
+                subprocess.run(
+                    ["git", "rev-list", "--count", f"{tag}..HEAD"],
+                    cwd=str(ROOT),
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout.strip()
+            )
+            if commit_count == 0:
+                return tag.lstrip("v")
+            version_parts = [int(part) for part in tag.lstrip("v").split(".")]
+            version_parts[-1] += 1
+            next_version = ".".join(str(part) for part in version_parts)
+            commit = subprocess.run(
+                ["git", "rev-parse", "--short=8", "HEAD"],
+                cwd=str(ROOT),
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+            return f"{next_version}.dev{commit_count}+g{commit}"
+        except (OSError, subprocess.SubprocessError, ValueError):
+            pass
     try:
         import importlib.metadata
 
@@ -59,17 +101,31 @@ def _version() -> str:
 
 def ensure_version_file(version: str) -> None:
     version_file = ROOT / "videocaptioner" / "_version.py"
-    if version_file.exists():
-        return
     version_file.write_text(f'__version__ = "{version}"\n', encoding="utf-8")
     print(f"Generated {version_file.relative_to(ROOT)} ({version})")
 
 
 def clean() -> None:
-    for path in [BUILD_DIR, DIST_DIR, ARTIFACT_DIR]:
+    for path in [BUILD_DIR, DIST_DIR]:
         if path.exists():
             print(f"Removing {path.relative_to(ROOT)}")
             shutil.rmtree(path)
+    # Keep the installer built on the other operating system. This matters
+    # when a maintainer downloads the Windows artifact and then rebuilds the
+    # macOS DMG locally (or vice versa).
+    if ARTIFACT_DIR.exists():
+        current_installer = {
+            "Darwin": MACOS_DMG_NAME,
+            "Windows": WINDOWS_SETUP_NAME,
+        }.get(platform.system())
+        if current_installer:
+            installer_path = ARTIFACT_DIR / current_installer
+            if installer_path.exists():
+                installer_path.unlink()
+        for archive_path in ARTIFACT_DIR.glob(
+            f"{PRODUCT_NAME}-*-{_platform_tag()}*.zip"
+        ):
+            archive_path.unlink()
 
 
 def prepare_ffmpeg() -> None:

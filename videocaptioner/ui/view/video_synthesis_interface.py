@@ -212,12 +212,6 @@ class VideoSynthesisInterface(QWidget):
         self.command_bar.addAction(folder_action)
 
     def setup_style(self):
-        self.subtitle_input.focusOutEvent = lambda e: super(
-            LineEdit, self.subtitle_input
-        ).focusOutEvent(e)
-        self.subtitle_input.paintEvent = lambda e: super(
-            LineEdit, self.subtitle_input
-        ).paintEvent(e)
         self.subtitle_input.setStyleSheet(
             self.subtitle_input.styleSheet()
             + """
@@ -233,12 +227,6 @@ class VideoSynthesisInterface(QWidget):
         """
         )
 
-        self.video_input.focusOutEvent = lambda e: super(
-            LineEdit, self.video_input
-        ).focusOutEvent(e)
-        self.video_input.paintEvent = lambda e: super(
-            LineEdit, self.video_input
-        ).paintEvent(e)
         self.video_input.setStyleSheet(
             self.video_input.styleSheet()
             + """

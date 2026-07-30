@@ -1,11 +1,12 @@
 import atexit
 import os
 import shutil
+import sys
 
 import psutil
 from PyQt5.QtCore import QSize, QThread, QTimer, QUrl
-from PyQt5.QtGui import QDesktopServices, QIcon
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QDesktopServices, QIcon, QKeySequence
+from PyQt5.QtWidgets import QAction, QApplication
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import (
     FluentWindow,
@@ -40,6 +41,7 @@ class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
         self.initWindow()
+        self._init_macos_edit_menu()
 
         # 创建子界面
         self.homeInterface = HomeInterface(self)
@@ -80,6 +82,42 @@ class MainWindow(FluentWindow):
 
         # 注册退出处理， 清理进程
         atexit.register(self.stop)
+
+    def _init_macos_edit_menu(self):
+        """Provide the standard native Edit menu expected by macOS users."""
+        if sys.platform != "darwin":
+            return
+
+        edit_menu = self.menuBar().addMenu(self.tr("编辑"))
+        actions = (
+            (self.tr("撤销"), QKeySequence.Undo, "undo"),
+            (self.tr("重做"), QKeySequence.Redo, "redo"),
+            (None, None, None),
+            (self.tr("剪切"), QKeySequence.Cut, "cut"),
+            (self.tr("复制"), QKeySequence.Copy, "copy"),
+            (self.tr("粘贴"), QKeySequence.Paste, "paste"),
+            (self.tr("全选"), QKeySequence.SelectAll, "selectAll"),
+        )
+        self._mac_edit_actions = []
+        for text, shortcut, method_name in actions:
+            if text is None:
+                edit_menu.addSeparator()
+                continue
+            action = QAction(text, self)
+            action.setShortcut(shortcut)
+            action.setMenuRole(QAction.NoRole)
+            action.triggered.connect(
+                lambda checked=False, name=method_name: self._invoke_focused_edit(name)
+            )
+            edit_menu.addAction(action)
+            self._mac_edit_actions.append(action)
+
+    @staticmethod
+    def _invoke_focused_edit(method_name):
+        focused = QApplication.focusWidget()
+        method = getattr(focused, method_name, None)
+        if callable(method) and focused.isEnabled():
+            method()
 
     def initNavigation(self):
         """初始化导航栏"""
