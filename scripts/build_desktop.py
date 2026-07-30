@@ -277,10 +277,9 @@ def create_windows_setup(version: str) -> Path:
     except subprocess.CalledProcessError as exc:
         # ISCC output can be emitted well before Python prints its traceback.
         # Repeat it here so CI failure annotations retain the compiler message.
-        if exc.stdout:
-            print(exc.stdout)
-        if exc.stderr:
-            print(exc.stderr, file=sys.stderr)
+        diagnostics = "\n".join(part for part in [exc.stdout, exc.stderr] if part)
+        if diagnostics:
+            print("Inno Setup compiler diagnostics:\n" + diagnostics, flush=True)
         raise
     else:
         if result.stdout:
