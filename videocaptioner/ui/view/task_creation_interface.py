@@ -44,6 +44,21 @@ LOGO_PATH = ASSETS_PATH / "logo.png"
 URL_PATTERN = re.compile(r"https?://[^\s<>\"'，。；：！？）】》]+")
 
 
+class UrlLineEdit(LineEdit):
+    """URL input with a Windows-style Ctrl+V fallback on macOS."""
+
+    def keyPressEvent(self, event):
+        if (
+            sys.platform == "darwin"
+            and event.key() == Qt.Key_V
+            and event.modifiers() == Qt.MetaModifier
+        ):
+            self.paste()
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
+
 class TaskCreationInterface(QWidget):
     """
     任务创建界面类，用于创建和配置任务。
@@ -92,7 +107,7 @@ class TaskCreationInterface(QWidget):
     def setup_search_layout(self):
         self.search_layout = QHBoxLayout()
         self.search_layout.setContentsMargins(80, 0, 80, 0)
-        self.search_input = LineEdit(self)
+        self.search_input = UrlLineEdit(self)
         self.search_input.setPlaceholderText(self.tr("请拖拽文件或输入视频URL"))
         self.search_input.setFixedHeight(40)
         self.search_input.setClearButtonEnabled(True)

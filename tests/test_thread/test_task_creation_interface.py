@@ -1,5 +1,10 @@
 """Tests for task input and clipboard handling."""
 
+import sys
+
+import pytest
+from PyQt5.QtCore import Qt
+from PyQt5.QtTest import QTest
 from PyQt5.QtWidgets import QApplication
 
 from videocaptioner.ui.view.task_creation_interface import TaskCreationInterface
@@ -28,4 +33,18 @@ def test_paste_button_reads_clipboard_and_normalizes_url(qapp):
     assert interface.search_input.text() == (
         "https://www.bilibili.com/video/BV1YPgh6TEWH/"
     )
+    interface.close()
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="macOS modifier mapping")
+def test_macos_control_v_compatibility_pastes_instead_of_typing_v(qapp):
+    interface = TaskCreationInterface()
+    interface.show()
+    interface.search_input.setFocus()
+    QApplication.clipboard().setText("https://example.com/video")
+
+    # Qt maps the physical Control key to MetaModifier on macOS.
+    QTest.keyClick(interface.search_input, Qt.Key_V, Qt.MetaModifier)
+
+    assert interface.search_input.text() == "https://example.com/video"
     interface.close()
