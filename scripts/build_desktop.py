@@ -20,6 +20,8 @@ DIST_DIR = ROOT / "dist"
 ARTIFACT_DIR = ROOT / "artifacts"
 RUNTIME_DIR = BUILD_DIR / "desktop-runtime"
 PRODUCT_NAME = "NovaCaption"
+MACOS_DMG_NAME = "VideoCaptioner-macOS-AppleSilicon.dmg"
+WINDOWS_SETUP_NAME = "VideoCaptioner-Setup-x64.exe"
 
 
 def _run(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
@@ -165,10 +167,137 @@ def archive(version: str) -> None:
         _archive_dir(app, ARTIFACT_DIR / f"{PRODUCT_NAME}-{version}-{tag}-app.zip")
 
 
+def create_macos_dmg() -> Path:
+    """Create an unsigned DMG suitable for private Apple Silicon distribution."""
+    if platform.system() != "Darwin":
+        raise RuntimeError("DMG packaging can only run on macOS")
+    if platform.machine().lower() != "arm64":
+        raise RuntimeError("The requested DMG must be built on Apple Silicon")
+
+    app = DIST_DIR / f"{PRODUCT_NAME}.app"
+    if not app.exists():
+        raise RuntimeError(f"App bundle not found: {app}")
+
+    # Ad-hoc signing records bundle integrity without requiring an Apple
+    # Developer certificate. Gatekeeper may still require manual approval.
+    _run(
+        [
+            "codesign",
+            "--force",
+            "--deep",
+            "--sign",
+            "-",
+            "--timestamp=none",
+            str(app),
+        ]
+    )
+
+    staging = BUILD_DIR / "dmg-staging"
+    if staging.exists():
+        shutil.rmtree(staging)
+    staging.mkdir(parents=True)
+    shutil.copytree(app, staging / app.name, symlinks=True)
+    (staging / "Applications").symlink_to("/Applications")
+
+    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+    output = ARTIFACT_DIR / MACOS_DMG_NAME
+    if output.exists():
+        output.unlink()
+    temporary_output = BUILD_DIR / MACOS_DMG_NAME
+    if temporary_output.exists():
+        temporary_output.unlink()
+    _run(
+        [
+            "hdiutil",
+            "create",
+            "-volname",
+            PRODUCT_NAME,
+            "-srcfolder",
+            str(staging),
+            "-ov",
+            "-format",
+            "UDZO",
+            str(temporary_output),
+        ]
+    )
+    # Copying to the artifact directory also avoids hdiutil retaining a busy
+    # vnode when the image is created directly inside a managed workspace.
+    shutil.copyfile(temporary_output, output)
+    temporary_output.unlink()
+    _run(["xattr", "-c", str(output)])
+    print(f"Created {output.relative_to(ROOT)}")
+    return output
+
+
+def _find_iscc() -> Path:
+    candidates = [
+        shutil.which("ISCC.exe"),
+        shutil.which("iscc"),
+        os.path.join(
+            os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"),
+            "Inno Setup 6",
+            "ISCC.exe",
+        ),
+        os.path.join(
+            os.environ.get("ProgramFiles", r"C:\Program Files"),
+            "Inno Setup 6",
+            "ISCC.exe",
+        ),
+    ]
+    for candidate in candidates:
+        if candidate and Path(candidate).is_file():
+            return Path(candidate)
+    raise RuntimeError(
+        "Inno Setup 6 was not found. Install it with: "
+        "choco install innosetup --no-progress -y"
+    )
+
+
+def create_windows_setup(version: str) -> Path:
+    """Create the requested Windows x64 setup executable with Inno Setup."""
+    if platform.system() != "Windows":
+        raise RuntimeError("Windows setup packaging can only run on Windows")
+
+    bundle = DIST_DIR / PRODUCT_NAME
+    executable = bundle / f"{PRODUCT_NAME}.exe"
+    if not executable.exists():
+        raise RuntimeError(f"Executable not found: {executable}")
+
+    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+    iss_file = ROOT / "packaging" / "windows" / "NovaCaption.iss"
+    _run(
+        [
+            str(_find_iscc()),
+            f"/DSourceDir={bundle}",
+            f"/DOutputDir={ARTIFACT_DIR}",
+            f"/DAppVersion={version}",
+            str(iss_file),
+        ]
+    )
+    output = ARTIFACT_DIR / WINDOWS_SETUP_NAME
+    if not output.exists():
+        raise RuntimeError(f"Windows installer not found: {output}")
+    print(f"Created {output.relative_to(ROOT)}")
+    return output
+
+
+def create_installer(version: str) -> Path:
+    if platform.system() == "Darwin":
+        return create_macos_dmg()
+    if platform.system() == "Windows":
+        return create_windows_setup(version)
+    raise RuntimeError("Installer packaging is only supported on Windows and macOS")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--clean", action="store_true", help="Remove build/dist/artifacts first")
     parser.add_argument("--no-archive", action="store_true", help="Build and verify without creating zip archives")
+    parser.add_argument(
+        "--no-installer",
+        action="store_true",
+        help="Skip platform installer creation (DMG or Setup EXE)",
+    )
     args = parser.parse_args()
 
     version = _version()
@@ -178,6 +307,8 @@ def main() -> int:
     prepare_ffmpeg()
     build_pyinstaller()
     verify_bundle()
+    if not args.no_installer:
+        create_installer(version)
     if not args.no_archive:
         archive(version)
     return 0

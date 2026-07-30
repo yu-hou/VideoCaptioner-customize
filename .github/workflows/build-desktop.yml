@@ -37,8 +37,8 @@ jobs:
         include:
           - name: Windows x64
             os: windows-latest
-          - name: macOS Intel
-            os: macos-15-intel
+          - name: macOS Apple Silicon
+            os: macos-15
 
     steps:
       - uses: actions/checkout@v6
@@ -56,6 +56,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
+      - name: Install Inno Setup
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
       - name: Build desktop bundle
         run: uv run --with pyinstaller --with static-ffmpeg python scripts/build_desktop.py --clean
 
@@ -66,7 +71,10 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: novacaption-${{ runner.os }}
-          path: artifacts/*.zip
+          path: |
+            artifacts/VideoCaptioner-Setup-x64.exe
+            artifacts/VideoCaptioner-macOS-AppleSilicon.dmg
+            artifacts/*.zip
           if-no-files-found: error
           retention-days: 14
 
