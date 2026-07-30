@@ -22,6 +22,12 @@ RUNTIME_DIR = BUILD_DIR / "desktop-runtime"
 PRODUCT_NAME = "NovaCaption"
 MACOS_DMG_NAME = "VideoCaptioner-macOS-AppleSilicon.dmg"
 WINDOWS_SETUP_NAME = "VideoCaptioner-Setup-x64.exe"
+# This repository was forked from the upstream v1.4.2 commit, but a newly
+# created GitHub repository may not contain the upstream tag refs. Keep the
+# release anchor so reproducible CI builds do not silently fall back to
+# hatch-vcs's 0.0.0 version when those refs are absent.
+VERSION_BASE = "1.4.2"
+VERSION_BASE_COMMIT = "d753521d57cf2311df96bfee96fe39c6306a8e09"
 
 
 def _run(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
@@ -34,7 +40,7 @@ def _version() -> str:
     # generated _version.py. Derive desktop build versions from Git first.
     if (ROOT / ".git").exists():
         try:
-            tag = subprocess.run(
+            tag_result = subprocess.run(
                 [
                     "git",
                     "describe",
@@ -46,11 +52,32 @@ def _version() -> str:
                 cwd=str(ROOT),
                 capture_output=True,
                 text=True,
-                check=True,
-            ).stdout.strip()
+            )
+            if tag_result.returncode == 0:
+                base_ref = tag_result.stdout.strip()
+                base_version = base_ref.lstrip("v")
+            else:
+                # Empty destination repositories commonly receive branches
+                # without tags. Fall back to the known upstream release
+                # commit, provided it is actually an ancestor of this build.
+                subprocess.run(
+                    [
+                        "git",
+                        "merge-base",
+                        "--is-ancestor",
+                        VERSION_BASE_COMMIT,
+                        "HEAD",
+                    ],
+                    cwd=str(ROOT),
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                base_ref = VERSION_BASE_COMMIT
+                base_version = VERSION_BASE
             commit_count = int(
                 subprocess.run(
-                    ["git", "rev-list", "--count", f"{tag}..HEAD"],
+                    ["git", "rev-list", "--count", f"{base_ref}..HEAD"],
                     cwd=str(ROOT),
                     capture_output=True,
                     text=True,
@@ -58,8 +85,8 @@ def _version() -> str:
                 ).stdout.strip()
             )
             if commit_count == 0:
-                return tag.lstrip("v")
-            version_parts = [int(part) for part in tag.lstrip("v").split(".")]
+                return base_version
+            version_parts = [int(part) for part in base_version.split(".")]
             version_parts[-1] += 1
             next_version = ".".join(str(part) for part in version_parts)
             commit = subprocess.run(
