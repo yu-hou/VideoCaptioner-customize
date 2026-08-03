@@ -1,7 +1,6 @@
 import os
 import re
 from pathlib import Path
-from urllib.parse import parse_qs, urlsplit
 
 import requests
 import yt_dlp
@@ -9,27 +8,12 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 from videocaptioner.config import APPDATA_PATH
 from videocaptioner.core.utils.logger import setup_logger
+from videocaptioner.core.utils.url_parser import normalize_video_url
 
 logger = setup_logger("video_download_thread")
 
-
-def normalize_video_url(url: str) -> str:
-    """将已知的视频分享页链接转换为 yt-dlp 支持的标准链接。"""
-    try:
-        parsed_url = urlsplit(url)
-    except ValueError:
-        return url
-
-    hostname = (parsed_url.hostname or "").lower()
-    is_douyin_host = hostname == "douyin.com" or hostname.endswith(".douyin.com")
-    if not is_douyin_host or parsed_url.path.rstrip("/") != "/jingxuan":
-        return url
-
-    modal_id = parse_qs(parsed_url.query).get("modal_id", [""])[0]
-    if not modal_id.isdigit():
-        return url
-
-    return f"https://www.douyin.com/video/{modal_id}"
+# 兼容旧导入路径
+__all__ = ["VideoDownloadThread", "normalize_video_url"]
 
 
 class VideoDownloadThread(QThread):

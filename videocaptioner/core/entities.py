@@ -835,13 +835,35 @@ class FullProcessTask:
     synthesis_config: Optional[SynthesisConfig] = None
 
 
-class BatchTaskType(Enum):
-    """批量处理任务类型"""
+class PipelineScope(Enum):
+    """主页自动流水线处理范围：自动执行到哪一步即停。"""
 
-    TRANSCRIBE = "批量转录"
-    SUBTITLE = "批量字幕"
-    TRANS_SUB = "转录+字幕"
-    FULL_PROCESS = "全流程处理"
+    ACQUIRE_ONLY = "仅获取视频"
+    TO_TRANSCRIBE = "到语音转录"
+    TO_SUBTITLE = "到字幕处理"
+    FULL = "全流程"
+
+    def __str__(self):
+        return self.value
+
+    @property
+    def continues_after_transcribe(self) -> bool:
+        """转录完成后是否自动进入字幕处理。"""
+        return self in (PipelineScope.TO_SUBTITLE, PipelineScope.FULL)
+
+    @property
+    def continues_after_subtitle(self) -> bool:
+        """字幕处理完成后是否自动进入视频合成。"""
+        return self is PipelineScope.FULL
+
+
+class BatchTaskType(Enum):
+    """批量处理任务类型（文案与 PipelineScope 对齐）。"""
+
+    TRANSCRIBE = PipelineScope.TO_TRANSCRIBE.value  # 到语音转录
+    SUBTITLE = "仅字幕处理"
+    TRANS_SUB = PipelineScope.TO_SUBTITLE.value  # 到字幕处理
+    FULL_PROCESS = PipelineScope.FULL.value  # 全流程
 
     def __str__(self):
         return self.value

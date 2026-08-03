@@ -1,6 +1,6 @@
 """Tests for video download URL normalization."""
 
-from videocaptioner.ui.thread.video_download_thread import normalize_video_url
+from videocaptioner.core.utils.url_parser import normalize_video_url
 
 
 def test_normalize_douyin_jingxuan_url():

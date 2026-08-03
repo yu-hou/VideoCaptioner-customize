@@ -38,6 +38,7 @@ docs/.vitepress/dist/
 /resource/bin/
 !/resource/bin/bin_environment.txt
 /AppData/
+artifacts/
 /work-dir/
 /*.srt
 /*.mp4

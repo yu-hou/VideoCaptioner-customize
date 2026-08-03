@@ -172,7 +172,7 @@ def export_douyin_cookies(
 
 def test_douyin_cookie(url: str, cookie_path: Path = DOUYIN_COOKIE_PATH) -> str:
     """Use yt-dlp to validate the saved cookie against a Douyin video URL."""
-    from videocaptioner.ui.thread.video_download_thread import normalize_video_url
+    from videocaptioner.core.utils.url_parser import normalize_video_url
 
     normalized_url = normalize_video_url(url.strip())
     if not normalized_url:

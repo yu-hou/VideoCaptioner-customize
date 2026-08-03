@@ -71,12 +71,20 @@ class BatchProcessInterface(QWidget):
         self.task_type_combo.addItems([str(task_type) for task_type in BatchTaskType])
         self.task_type_combo.setCurrentText(str(BatchTaskType.FULL_PROCESS))
 
-        # 任务类型说明
+        # 任务类型说明（与主页 PipelineScope 文案对齐）
         self.task_type_descriptions = {
-            str(BatchTaskType.TRANSCRIBE): self.tr("仅进行语音识别，生成字幕文件"),
-            str(BatchTaskType.SUBTITLE): self.tr("对已有字幕进行分割、优化或翻译"),
-            str(BatchTaskType.TRANS_SUB): self.tr("先转录再处理字幕，不合成视频"),
-            str(BatchTaskType.FULL_PROCESS): self.tr("转录 → 字幕处理 → 合成视频"),
+            str(BatchTaskType.TRANSCRIBE): self.tr(
+                "自动执行到语音转录，生成原始字幕后停止"
+            ),
+            str(BatchTaskType.SUBTITLE): self.tr(
+                "对已有字幕进行分割、优化或翻译（不转录）"
+            ),
+            str(BatchTaskType.TRANS_SUB): self.tr(
+                "自动执行到字幕优化与翻译，不合成视频"
+            ),
+            str(BatchTaskType.FULL_PROCESS): self.tr(
+                "转录 → 字幕处理 → 合成视频（全流程）"
+            ),
         }
 
         # 控制按钮

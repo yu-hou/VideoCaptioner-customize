@@ -4,7 +4,7 @@ import shutil
 import sys
 
 import psutil
-from PyQt5.QtCore import QSize, QThread, QTimer, QUrl
+from PyQt5.QtCore import QRect, QSize, QThread, QTimer, QUrl
 from PyQt5.QtGui import QDesktopServices, QIcon, QKeySequence
 from PyQt5.QtWidgets import QAction, QApplication, QMenuBar
 from qfluentwidgets import FluentIcon as FIF
@@ -73,6 +73,9 @@ class MainWindow(FluentWindow):
         # 初始化导航界面
         self.initNavigation()
         self.splashScreen.finish()
+
+        # 子界面加载后可能撑大窗口，再次限制在可用屏幕内
+        QTimer.singleShot(0, self._fit_window_to_screen)
 
         # 检查系统依赖
         self._check_ffmpeg()
@@ -160,10 +163,44 @@ class MainWindow(FluentWindow):
             self.setWindowTitle(APP_DISPLAY_NAME)
         self.stackedWidget.setCurrentWidget(interface, popOut=False)
 
+    @staticmethod
+    def _available_screen_geometry() -> QRect:
+        """当前/主屏可用区域（排除菜单栏与 Dock）。"""
+        app = QApplication.instance()
+        screen = None
+        if app is not None:
+            screen = app.primaryScreen()
+        if screen is None:
+            # 回退：旧 API（多屏/刘海屏上不如 primaryScreen 准确）
+            desktop = QApplication.desktop()
+            return desktop.availableGeometry() if desktop else QRect(0, 0, 1280, 800)
+        return screen.availableGeometry()
+
+    def _fit_window_to_screen(self) -> None:
+        """确保窗口不超出可用屏幕，避免 macOS 上贴顶后底部按钮点不到。"""
+        available = self._available_screen_geometry()
+        if available.width() <= 0 or available.height() <= 0:
+            return
+
+        # 允许暂时低于 minimumSize，优先保证整窗落在可用区域内
+        new_w = min(self.width(), available.width())
+        new_h = min(self.height(), available.height())
+        if new_w < self.minimumWidth() or new_h < self.minimumHeight():
+            self.setMinimumSize(min(self.minimumWidth(), new_w), min(self.minimumHeight(), new_h))
+        if new_w != self.width() or new_h != self.height():
+            self.resize(new_w, new_h)
+
+        frame = self.frameGeometry()
+        max_x = available.x() + max(0, available.width() - frame.width())
+        max_y = available.y() + max(0, available.height() - frame.height())
+        x = min(max(frame.x(), available.x()), max_x)
+        y = min(max(frame.y(), available.y()), max_y)
+        if frame.x() != x or frame.y() != y:
+            self.move(x, y)
+
     def initWindow(self):
         """初始化窗口"""
-        self.resize(1050, 800)
-        self.setMinimumWidth(700)
+        self.setMinimumSize(700, 520)
         self.setWindowIcon(QIcon(str(LOGO_PATH)))
         self.setWindowTitle(APP_DISPLAY_NAME)
 
@@ -174,13 +211,22 @@ class MainWindow(FluentWindow):
         self.splashScreen.setIconSize(QSize(106, 106))
         self.splashScreen.raise_()
 
-        # 设置窗口位置, 居中
-        desktop = QApplication.desktop().availableGeometry()
-        w, h = desktop.width(), desktop.height()
-        self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
+        # 按可用屏幕限制初始尺寸并居中（必须加上 availableGeometry 的 x/y 偏移）
+        preferred = QSize(1050, 800)
+        available = self._available_screen_geometry()
+        width = min(preferred.width(), max(self.minimumWidth(), int(available.width() * 0.92)))
+        height = min(
+            preferred.height(), max(self.minimumHeight(), int(available.height() * 0.90))
+        )
+        self.resize(width, height)
+        self.move(
+            available.x() + (available.width() - self.width()) // 2,
+            available.y() + (available.height() - self.height()) // 2,
+        )
 
         self.show()
         QApplication.processEvents()
+        self._fit_window_to_screen()
 
     def onGithubDialog(self):
         """打开GitHub"""

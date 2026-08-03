@@ -18,7 +18,7 @@ def test_normalize_user_input_extracts_url_from_share_text():
     )
 
     assert TaskCreationInterface.normalize_user_input(value) == (
-        "https://www.douyin.com/jingxuan?modal_id=7659705531116870065"
+        "https://www.douyin.com/video/7659705531116870065"
     )
 
 

@@ -1,4 +1,54 @@
+from PyQt5.QtCore import QRect
+
 from videocaptioner.ui.view import main_window
+
+
+def test_fit_window_to_screen_clamps_oversized_geometry(monkeypatch):
+    """窗口高于可用区域时应缩小并移回屏幕内，避免贴顶裁切底部。"""
+
+    class FakeWindow:
+        def __init__(self):
+            self._w = 1050
+            self._h = 1200
+            self._x = -20
+            self._y = -40
+            self._min_w = 700
+            self._min_h = 520
+
+        def width(self):
+            return self._w
+
+        def height(self):
+            return self._h
+
+        def minimumWidth(self):
+            return self._min_w
+
+        def minimumHeight(self):
+            return self._min_h
+
+        def setMinimumSize(self, w, h):
+            self._min_w, self._min_h = w, h
+
+        def resize(self, w, h):
+            self._w, self._h = w, h
+
+        def move(self, x, y):
+            self._x, self._y = x, y
+
+        def frameGeometry(self):
+            return QRect(self._x, self._y, self._w, self._h)
+
+        def _available_screen_geometry(self):
+            return QRect(0, 30, 1440, 800)
+
+    host = FakeWindow()
+    main_window.MainWindow._fit_window_to_screen(host)
+
+    assert host.width() == 1050
+    assert host.height() == 800
+    assert host._x == 0
+    assert host._y == 30
 
 
 def test_macos_edit_menu_supports_fluent_window_widget_base(monkeypatch):

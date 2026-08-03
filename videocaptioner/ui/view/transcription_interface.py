@@ -46,7 +46,11 @@ from videocaptioner.core.entities import (
     TranscribeTask,
     VideoInfo,
 )
-from videocaptioner.core.utils.platform_utils import get_available_transcribe_models, open_folder
+from videocaptioner.core.utils.platform_utils import (
+    get_available_transcribe_models,
+    open_folder,
+    reveal_in_explorer,
+)
 from videocaptioner.ui.common.config import cfg
 from videocaptioner.ui.common.signal_bus import signalBus
 from videocaptioner.ui.components.transcription_setting_card import TranscriptionSettingCard
@@ -264,22 +268,17 @@ class VideoInfoCard(CardWidget):
         self.start_transcription()
 
     def on_open_folder_clicked(self):
-        """打开文件夹按钮点击事件"""
-        if self.task and self.task.output_path:
-            original_subtitle_save_path = Path(str(self.task.output_path))
-            target_dir = str(
-                original_subtitle_save_path.parent
-                if original_subtitle_save_path.exists()
-                else Path(str(self.task.file_path)).parent
-            )
-            open_folder(target_dir)
-        else:
-            InfoBar.warning(
-                self.tr("警告"),
-                self.tr("没有可用的字幕文件夹"),
-                duration=INFOBAR_DURATION_WARNING,
-                parent=self,
-            )
+        """打开当前视频或已生成字幕所在位置。"""
+        opener = getattr(self.transcription_interface, "open_current_location", None)
+        if callable(opener):
+            opener()
+            return
+        InfoBar.warning(
+            self.tr("警告"),
+            self.tr("没有可打开的文件位置"),
+            duration=INFOBAR_DURATION_WARNING,
+            parent=self,
+        )
 
     def start_transcription(self, need_create_task=True):
         """开始转录过程"""
@@ -381,8 +380,15 @@ class TranscriptionInterface(QWidget):
         self.command_bar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)  # type: ignore
         self.command_bar.setFixedHeight(40)
 
-        # 添加打开文件按钮
-        self.open_file_action = Action(FluentIcon.FOLDER, self.tr("打开文件"))
+        # 打开所在位置（与字幕页/合成页的 FOLDER 行为一致）
+        self.open_folder_action = Action(FluentIcon.FOLDER, self.tr("打开文件夹"))
+        self.open_folder_action.setToolTip(self.tr("打开当前文件所在文件夹"))
+        self.open_folder_action.triggered.connect(self.open_current_location)
+        self.command_bar.addAction(self.open_folder_action)
+
+        # 选择媒体文件（原「打开文件」）
+        self.open_file_action = Action(FluentIcon.FOLDER_ADD, self.tr("选择文件"))
+        self.open_file_action.setToolTip(self.tr("选择要转录的媒体文件"))
         self.open_file_action.triggered.connect(self._on_file_select)
         self.command_bar.addAction(self.open_file_action)
 
@@ -469,7 +475,6 @@ class TranscriptionInterface(QWidget):
         self.is_processing = False
         if task.need_next_task:
             self.finished.emit(task.output_path, task.file_path)
-
             InfoBar.success(
                 self.tr("转录完成"),
                 self.tr("开始字幕优化..."),
@@ -477,10 +482,84 @@ class TranscriptionInterface(QWidget):
                 position=InfoBarPosition.BOTTOM,
                 parent=self.parent(),
             )
+        else:
+            InfoBar.success(
+                self.tr("转录完成"),
+                self.tr("原始字幕已生成"),
+                duration=INFOBAR_DURATION_SUCCESS,
+                position=InfoBarPosition.BOTTOM,
+                parent=self.parent(),
+            )
+
+    def _resolve_current_location(self):
+        """解析应打开的文件或目录。优先已生成字幕，否则当前视频。"""
+        task = self.task or self.video_info_card.task
+        video_info = self.video_info_card.video_info
+        current_video = None
+        if video_info and video_info.file_path:
+            current_video = str(Path(video_info.file_path))
+        elif task and task.file_path:
+            current_video = str(Path(task.file_path))
+
+        # 字幕产物存在且仍对应当前视频时，定位到字幕文件
+        if task and task.output_path and task.file_path:
+            task_video = str(Path(task.file_path))
+            if current_video is None or Path(task_video).resolve() == Path(
+                current_video
+            ).resolve():
+                out = Path(task.output_path)
+                if out.is_file():
+                    return str(out), True
+                if out.parent.is_dir():
+                    for match in sorted(out.parent.glob(f"{out.stem}.*")):
+                        if match.is_file():
+                            return str(match), True
+
+        if current_video and Path(current_video).is_file():
+            return current_video, True
+
+        if current_video:
+            parent = Path(current_video).parent
+            if parent.is_dir():
+                return str(parent), False
+
+        work_dir = str(cfg.get(cfg.work_dir))
+        if os.path.isdir(work_dir):
+            return work_dir, False
+        return None, False
+
+    def open_current_location(self) -> None:
+        """打开当前视频或字幕所在位置。"""
+        target, reveal = self._resolve_current_location()
+        if not target:
+            InfoBar.warning(
+                self.tr("警告"),
+                self.tr("没有可打开的文件位置，请先导入媒体文件"),
+                duration=INFOBAR_DURATION_WARNING,
+                parent=self,
+            )
+            return
+        if reveal and Path(target).is_file():
+            reveal_in_explorer(target)
+        else:
+            open_folder(target)
+
+    def _start_dir_for_file_dialog(self) -> str:
+        """选择文件对话框的起始目录：当前视频目录 > 工作目录 > 桌面。"""
+        target, _reveal = self._resolve_current_location()
+        if target:
+            path = Path(target)
+            if path.is_file():
+                return str(path.parent)
+            if path.is_dir():
+                return str(path)
+        work_dir = str(cfg.get(cfg.work_dir))
+        if os.path.isdir(work_dir):
+            return work_dir
+        return QStandardPaths.writableLocation(QStandardPaths.DesktopLocation)
 
     def _on_file_select(self):
         """文件选择处理"""
-        desktop_path = QStandardPaths.writableLocation(QStandardPaths.DesktopLocation)
         file_dialog = QFileDialog()
 
         video_formats = " ".join(f"*.{fmt.value}" for fmt in SupportedVideoFormats)
@@ -488,7 +567,10 @@ class TranscriptionInterface(QWidget):
         filter_str = f"{self.tr('媒体文件')} ({video_formats} {audio_formats});;{self.tr('视频文件')} ({video_formats});;{self.tr('音频文件')} ({audio_formats})"
 
         file_path, _ = file_dialog.getOpenFileName(
-            self, self.tr("选择媒体文件"), desktop_path, filter_str
+            self,
+            self.tr("选择媒体文件"),
+            self._start_dir_for_file_dialog(),
+            filter_str,
         )
         if file_path:
             self.update_info(file_path)

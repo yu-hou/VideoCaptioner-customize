@@ -22,6 +22,7 @@ from videocaptioner.config import SETTINGS_PATH, WORK_PATH
 from videocaptioner.core.entities import (
     FasterWhisperModelEnum,
     LLMServiceEnum,
+    PipelineScope,
     SubtitleLayoutEnum,
     SubtitleRenderModeEnum,
     TranscribeLanguageEnum,
@@ -82,6 +83,15 @@ class Config(QConfig):
     )
     douyin_chrome_profile = ConfigItem("Download", "DouyinChromeProfile", "")
     douyin_test_url = ConfigItem("Download", "DouyinTestUrl", "")
+
+    # 主页自动流水线处理范围（默认全流程，兼容旧行为）
+    pipeline_scope = OptionsConfigItem(
+        "Pipeline",
+        "Scope",
+        PipelineScope.FULL,
+        OptionsValidator(PipelineScope),
+        EnumSerializer(PipelineScope),
+    )
 
     # LLM配置
     llm_service = OptionsConfigItem(
