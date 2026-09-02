@@ -199,7 +199,8 @@ API 地址与密钥，并妥善保管凭据。
 
 1. 在主界面点击 **"任务创建"** 标签
 2. 拖拽视频文件到窗口，或点击选择文件
-   - 也可以输入 YouTube、B站等视频链接
+   - 也可以输入 YouTube、B站、抖音、视频号等视频链接
+   - 抖音和视频号需要先在设置或首次向导中读取 Chrome Cookie，视频号还要登录腾讯元宝，详见 [Cookie 配置](/guide/cookies-config) 和 [视频号下载](/guide/wechat-channels-download)
 3. 点击 **"开始全流程处理"** 按钮
 4. 等待处理完成，输出文件保存在 `work-dir/` 目录
 

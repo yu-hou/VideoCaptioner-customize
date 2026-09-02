@@ -257,6 +257,7 @@ export default defineConfig({
                 { text: '快速示例', link: '/guide/quick-example' },
                 { text: 'LLM API 配置', link: '/guide/llm-config' },
                 { text: 'Cookie 配置', link: '/guide/cookies-config' },
+                { text: '视频号下载', link: '/guide/wechat-channels-download' },
                 { text: '基础配置', link: '/guide/configuration' },
                 { text: '工作流程', link: '/guide/workflow' },
                 { text: '常见问题', link: '/guide/faq' }
@@ -288,6 +289,7 @@ export default defineConfig({
               items: [
                 { text: '架构设计', link: '/dev/architecture' },
                 { text: 'API 文档', link: '/dev/api' },
+                { text: '视频号下载方案', link: '/dev/wechat-channels-download-feasibility' },
                 { text: '贡献指南', link: '/dev/contributing' }
               ]
             }

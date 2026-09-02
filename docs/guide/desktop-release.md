@@ -2,7 +2,10 @@
 
 NovaCaption publishes desktop bundles for Windows and macOS from GitHub Actions.
 Users can download the zip files from a GitHub Release, extract them, and run the
-bundled `NovaCaption` executable without installing Python or FFmpeg.
+bundled `NovaCaption` executable without installing Python or FFmpeg. The Windows
+and macOS apps are windowed: double-clicking `NovaCaption.exe` does not open a
+terminal. Command-line use such as `NovaCaption.exe --version` still prints to
+the parent console.
 
 ## Local build
 

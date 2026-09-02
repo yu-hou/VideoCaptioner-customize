@@ -45,11 +45,12 @@ class ChromeProfileCard(SettingCard):
     refreshClicked = pyqtSignal()
     profileChanged = pyqtSignal(int)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, content: str | None = None):
         super().__init__(
             FIF.PEOPLE,
             _tr("Chrome 用户"),
-            _tr("选择已经登录并能正常播放抖音视频的 Chrome Profile"),
+            content
+            or _tr("选择已经登录并能正常播放抖音视频的 Chrome Profile"),
             parent,
         )
         self.comboBox = ComboBox(self)
@@ -65,25 +66,35 @@ class ChromeProfileCard(SettingCard):
 
 
 class CookieTestUrlCard(SettingCard):
-    """Input card for the Douyin URL used by the cookie check."""
+    """Input card for the URL used by a cookie check."""
 
-    def __init__(self, parent=None):
+    def __init__(
+        self,
+        parent=None,
+        *,
+        title: str | None = None,
+        content: str | None = None,
+        placeholder: str | None = None,
+        config_item=None,
+    ):
         super().__init__(
             FIF.LINK,
-            _tr("测试视频"),
-            _tr("支持普通抖音链接和带 modal_id 的抖音精选链接"),
+            title or _tr("测试视频"),
+            content or _tr("支持普通抖音链接和带 modal_id 的抖音精选链接"),
             parent,
         )
+        self._config_item = config_item if config_item is not None else cfg.douyin_test_url
         self.lineEdit = LineEdit(self)
         self.lineEdit.setMinimumWidth(330)
         self.lineEdit.setPlaceholderText(
-            "https://www.douyin.com/video/... 或 /jingxuan?modal_id=..."
+            placeholder
+            or "https://www.douyin.com/video/... 或 /jingxuan?modal_id=..."
         )
-        self.lineEdit.setText(str(cfg.get(cfg.douyin_test_url)))
+        self.lineEdit.setText(str(cfg.get(self._config_item)))
         self.hBoxLayout.addWidget(self.lineEdit, 1, Qt.AlignRight)  # type: ignore
         self.hBoxLayout.addSpacing(16)
         self.lineEdit.textChanged.connect(
-            lambda value: cfg.set(cfg.douyin_test_url, value)
+            lambda value: cfg.set(self._config_item, value)
         )
 
 

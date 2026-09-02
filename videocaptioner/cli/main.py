@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from videocaptioner.cli import exit_codes as EXIT
+from videocaptioner.cli.windows_console import cli_needs_console, ensure_windows_stdio
 
 
 def _configure_stdio() -> None:
@@ -716,6 +717,8 @@ def _run_style(args: argparse.Namespace) -> int:
 
 
 def main(argv: Optional[List[str]] = None) -> int:
+    if cli_needs_console(sys.argv[1:] if argv is None else argv):
+        ensure_windows_stdio()
     _configure_stdio()
     parser = build_parser()
     args = parser.parse_args(argv)

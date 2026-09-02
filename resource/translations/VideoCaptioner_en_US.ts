@@ -171,6 +171,79 @@
     </message>
 </context>
 <context>
+    <name>YuanbaoCookieManager</name>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="44"/>
+        <source>视频号 Cookie（腾讯元宝）</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="50"/>
+        <source>选择已经登录腾讯元宝的 Chrome Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="53"/>
+        <source>打开腾讯元宝</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="55"/>
+        <source>登录腾讯元宝</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="56"/>
+        <source>请使用上方所选 Profile 登录腾讯元宝，并确认首页可以正常打开</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="59"/>
+        <source>读取 Cookie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="61"/>
+        <source>从 Chrome 读取腾讯元宝 Cookie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="62"/>
+        <source>只保存腾讯元宝相关 Cookie，不会导出其他网站的登录信息</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="68"/>
+        <source>测试视频号链接</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="69"/>
+        <source>支持 https://weixin.qq.com/sph/... 分享链接</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="74"/>
+        <source>测试 Cookie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="76"/>
+        <source>验证视频号解析</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="77"/>
+        <source>用于确认腾讯元宝登录状态和视频号链接是否可用</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/YuanbaoCookieManager.py" line="80"/>
+        <source>当前状态</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DownloadDialog</name>
     <message>
         <location filename="../../videocaptioner/ui/components/WhisperCppSettingWidget.py" line="127"/>
@@ -546,7 +619,7 @@
     </message>
     <message>
         <location filename="../../videocaptioner/ui/components/FirstRunWizard.py" line="107"/>
-        <source>这个向导会帮助你设置文件保存位置和抖音下载环境。所有设置以后都可以在“设置”页面重新修改。</source>
+        <source>这个向导会帮助你设置文件保存位置、抖音和视频号下载环境。所有设置以后都可以在“设置”页面重新修改。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -586,8 +659,7 @@
     </message>
     <message>
         <location filename="../../videocaptioner/ui/components/FirstRunWizard.py" line="171"/>
-        <source>如果以后抖音提示 Cookie 失效，请打开：
-设置 → 抖音 Cookie → 打开抖音 → 读取 Cookie → 测试 Cookie</source>
+        <source>如果以后提示 Cookie 失效，请在设置中打开对应平台的 Cookie 卡片，重新登录、读取并测试 Cookie。视频号不需要安装证书或开启系统代理。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -608,8 +680,19 @@
 1. 选择视频和字幕的保存位置
 2. 选择平时使用的 Chrome 用户
 3. 登录抖音并读取 Cookie
+4. 登录腾讯元宝并读取视频号 Cookie
 
 NovaCaption 是基于 VideoCaptioner 的独立定制版本，并非上游官方发行。</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/FirstRunWizard.py" line="190"/>
+        <source>配置视频号下载</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/components/FirstRunWizard.py" line="192"/>
+        <source>选择 Chrome 用户，点击“打开腾讯元宝”完成登录，再点击“读取 Cookie”。无需安装证书或开启系统代理。</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1487,6 +1570,16 @@ Note: When using small LLM models, it is recommended to keep the script within 1
     <message>
         <location filename="../../videocaptioner/ui/view/setting_interface.py" line="751"/>
         <source>抖音 Cookie 配置失败</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/view/setting_interface.py" line="767"/>
+        <source>视频号 Cookie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/view/setting_interface.py" line="774"/>
+        <source>视频号 Cookie 配置失败</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2537,7 +2630,7 @@ Note: When using small LLM models, it is recommended to keep the script within 1
     </message>
     <message>
         <location filename="../../videocaptioner/ui/view/user_guide_interface.py" line="104"/>
-        <source>设置向导会帮你选择结果保存位置，并配置抖音下载所需的 Chrome 用户和 Cookie。关闭后也可以随时从这里重新打开。</source>
+        <source>设置向导会帮你选择结果保存位置，并配置抖音、视频号下载所需的 Chrome 用户和 Cookie。关闭后也可以随时从这里重新打开。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2562,7 +2655,7 @@ Note: When using small LLM models, it is recommended to keep the script within 1
     </message>
     <message>
         <location filename="../../videocaptioner/ui/view/user_guide_interface.py" line="132"/>
-        <source>可以选择电脑里的音视频文件，也可以复制 B站、小红书、抖音等平台的视频链接。</source>
+        <source>可以选择电脑里的音视频文件，也可以复制 B站、小红书、抖音、视频号等平台的视频链接。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2612,7 +2705,7 @@ Note: When using small LLM models, it is recommended to keep the script within 1
     </message>
     <message>
         <location filename="../../videocaptioner/ui/view/user_guide_interface.py" line="192"/>
-        <source>主页 → 任务创建：粘贴链接后开始。若是抖音链接，请先完成向导中的 Cookie 配置。</source>
+        <source>主页 → 任务创建：粘贴链接后开始。若是抖音或视频号链接，请先完成向导中对应平台的 Cookie 配置。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2676,7 +2769,12 @@ Note: When using small LLM models, it is recommended to keep the script within 1
     </message>
     <message>
         <location filename="../../videocaptioner/ui/view/user_guide_interface.py" line="276"/>
-        <source>抖音下载失败：重新打开设置向导，读取并测试 Cookie。</source>
+        <source>抖音下载失败：重新打开设置向导，读取并测试抖音 Cookie。</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../videocaptioner/ui/view/user_guide_interface.py" line="313"/>
+        <source>视频号下载失败：在设置或向导中打开腾讯元宝、读取并测试 Cookie。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

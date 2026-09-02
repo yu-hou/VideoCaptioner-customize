@@ -231,7 +231,8 @@ videocaptioner process input.mp4 \
 videocaptioner download <URL> [-o 目录]
 ```
 
-支持 YouTube、B站等 yt-dlp 支持的平台。
+支持 YouTube、B站等 yt-dlp 支持的平台。视频号链接通过本机腾讯元宝 Cookie 解析，
+无需证书、系统代理或伴侣服务，详见[视频号下载](./guide/wechat-channels-download.md)。
 
 ---
 

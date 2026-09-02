@@ -60,6 +60,7 @@ class BatchUrlDialog(MessageBoxBase):
             self.tr(
                 "例如：\n"
                 "https://www.bilibili.com/video/BVxxxx\n"
+                "https://weixin.qq.com/sph/xxxx\n"
                 "https://www.youtube.com/watch?v=xxxx\n"
                 "或用逗号、分号分隔多条链接"
             )

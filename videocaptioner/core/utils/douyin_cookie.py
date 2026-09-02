@@ -7,13 +7,12 @@ import os
 import platform
 from dataclasses import dataclass
 from datetime import datetime
-from http.cookiejar import MozillaCookieJar
 from pathlib import Path
-from typing import Iterable
 
 import yt_dlp
 
 from videocaptioner.config import APPDATA_PATH
+from videocaptioner.core.utils.browser_cookie import cookie_status, save_scoped_cookies
 
 DOUYIN_COOKIE_PATH = APPDATA_PATH / "cookies.txt"
 DOUYIN_COOKIE_DOMAINS = (
@@ -107,32 +106,12 @@ def _is_douyin_domain(domain: str) -> bool:
     return any(domain == suffix or domain.endswith(f".{suffix}") for suffix in DOUYIN_COOKIE_DOMAINS)
 
 
-def _iter_cookie_domains(cookie_path: Path) -> Iterable[str]:
-    with cookie_path.open("r", encoding="utf-8") as cookie_file:
-        for raw_line in cookie_file:
-            line = raw_line.rstrip("\n")
-            if line.startswith("#HttpOnly_"):
-                line = line.removeprefix("#HttpOnly_")
-            elif line.startswith("#"):
-                continue
-            fields = line.split("\t")
-            if len(fields) >= 7:
-                yield fields[0]
-
-
 def get_douyin_cookie_status(
     cookie_path: Path = DOUYIN_COOKIE_PATH,
 ) -> DouyinCookieStatus:
     """Inspect a Netscape cookie file without returning secret values."""
-    if not cookie_path.is_file():
-        return DouyinCookieStatus(False, 0, None)
-
-    try:
-        count = sum(1 for domain in _iter_cookie_domains(cookie_path) if _is_douyin_domain(domain))
-        updated_at = datetime.fromtimestamp(cookie_path.stat().st_mtime)
-    except OSError:
-        return DouyinCookieStatus(False, 0, None)
-    return DouyinCookieStatus(True, count, updated_at)
+    exists, count, updated_at = cookie_status(cookie_path, _is_douyin_domain)
+    return DouyinCookieStatus(exists, count, updated_at)
 
 
 def export_douyin_cookies(
@@ -151,23 +130,12 @@ def export_douyin_cookies(
     with yt_dlp.YoutubeDL(options) as ydl:
         source_cookie_jar = ydl.cookiejar
 
-    cookie_path.parent.mkdir(parents=True, exist_ok=True)
-    temporary_path = cookie_path.with_suffix(".tmp")
-    filtered_cookie_jar = MozillaCookieJar(str(temporary_path))
-    for cookie in source_cookie_jar:
-        if _is_douyin_domain(cookie.domain):
-            filtered_cookie_jar.set_cookie(cookie)
-
-    cookie_count = len(filtered_cookie_jar)
-    if cookie_count == 0:
-        raise RuntimeError(
-            "该 Chrome Profile 中没有找到抖音 Cookie。"
-            "请先用这个 Profile 打开抖音、完成验证并确认视频可以播放。"
-        )
-
-    filtered_cookie_jar.save(ignore_discard=True, ignore_expires=True)
-    os.replace(temporary_path, cookie_path)
-    return cookie_count
+    return save_scoped_cookies(
+        source_cookie_jar,
+        cookie_path,
+        _is_douyin_domain,
+        "抖音",
+    )
 
 
 def test_douyin_cookie(url: str, cookie_path: Path = DOUYIN_COOKIE_PATH) -> str:
