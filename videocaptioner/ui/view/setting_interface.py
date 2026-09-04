@@ -44,6 +44,7 @@ from videocaptioner.ui.common.signal_bus import signalBus
 from videocaptioner.ui.components.DouyinCookieManager import DouyinCookieManager
 from videocaptioner.ui.components.EditComboBoxSettingCard import EditComboBoxSettingCard
 from videocaptioner.ui.components.LineEditSettingCard import LineEditSettingCard
+from videocaptioner.ui.components.YuanbaoCookieManager import YuanbaoCookieManager
 
 
 class SettingInterface(ScrollArea):
@@ -94,6 +95,7 @@ class SettingInterface(ScrollArea):
         """初始化所有配置卡片"""
 
         self.douyinCookieManager = DouyinCookieManager(self.scrollWidget)
+        self.yuanbaoCookieManager = YuanbaoCookieManager(self.scrollWidget)
 
         # ASR 服务配置卡片
         self.__createASRServiceCards()
@@ -628,6 +630,7 @@ class SettingInterface(ScrollArea):
         self.expandLayout.addWidget(self.subtitleGroup)
         self.expandLayout.addWidget(self.saveGroup)
         self.expandLayout.addWidget(self.douyinCookieManager)
+        self.expandLayout.addWidget(self.yuanbaoCookieManager)
         self.expandLayout.addWidget(self.personalGroup)
         self.expandLayout.addWidget(self.aboutGroup)
 
@@ -661,6 +664,9 @@ class SettingInterface(ScrollArea):
 
         self.douyinCookieManager.operationFinished.connect(
             self.__onDouyinCookieOperationFinished
+        )
+        self.yuanbaoCookieManager.operationFinished.connect(
+            self.__onYuanbaoCookieOperationFinished
         )
 
         # 字幕样式修改跳转
@@ -750,6 +756,22 @@ class SettingInterface(ScrollArea):
         else:
             InfoBar.error(
                 self.tr("抖音 Cookie 配置失败"),
+                message,
+                duration=INFOBAR_DURATION_ERROR,
+                parent=self,
+            )
+
+    def __onYuanbaoCookieOperationFinished(self, success: bool, message: str):
+        if success:
+            InfoBar.success(
+                self.tr("视频号 Cookie"),
+                message,
+                duration=INFOBAR_DURATION_SUCCESS,
+                parent=self,
+            )
+        else:
+            InfoBar.error(
+                self.tr("视频号 Cookie 配置失败"),
                 message,
                 duration=INFOBAR_DURATION_ERROR,
                 parent=self,

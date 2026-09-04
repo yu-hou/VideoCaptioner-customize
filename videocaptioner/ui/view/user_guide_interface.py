@@ -136,7 +136,7 @@ class UserGuideInterface(ScrollArea):
         title.setObjectName("guideCardTitle")
         description = BodyLabel(
             self.tr(
-                "设置向导会帮你选择结果保存位置，并配置抖音下载所需的 "
+                "设置向导会帮你选择结果保存位置，并配置抖音、视频号下载所需的 "
                 "Chrome 用户和 Cookie。关闭后也可以随时从这里重新打开。"
             ),
             card,
@@ -167,7 +167,7 @@ class UserGuideInterface(ScrollArea):
                 self.tr("准备视频"),
                 self.tr(
                     "可以选择电脑里的音视频文件，也可以复制 B站、小红书、"
-                    "抖音等平台的视频链接。"
+                    "抖音、视频号等平台的视频链接。"
                 ),
             ),
             (
@@ -227,8 +227,8 @@ class UserGuideInterface(ScrollArea):
             (
                 self.tr("下载链接并自动生成字幕"),
                 self.tr(
-                    "主页 → 任务创建：粘贴链接后开始。若是抖音链接，请先完成"
-                    "向导中的 Cookie 配置。"
+                    "主页 → 任务创建：粘贴链接后开始。若是抖音或视频号链接，"
+                    "请先完成向导中对应平台的 Cookie 配置。"
                 ),
             ),
             (
@@ -309,7 +309,10 @@ class UserGuideInterface(ScrollArea):
     def _build_troubleshooting(self) -> None:
         self._section_title(self.tr("遇到问题时"))
         hints = [
-            self.tr("抖音下载失败：重新打开设置向导，读取并测试 Cookie。"),
+            self.tr("抖音下载失败：重新打开设置向导，读取并测试抖音 Cookie。"),
+            self.tr(
+                "视频号下载失败：在设置或向导中打开腾讯元宝、读取并测试 Cookie。"
+            ),
             self.tr("模型连接失败：检查 API 地址、API Key 和模型名称。"),
             self.tr("找不到输出文件：检查“设置 → 工作目录路径”。"),
             self.tr("处理卡住或失败：点击主页底部“查看日志”读取具体原因。"),

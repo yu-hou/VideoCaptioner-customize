@@ -27,4 +27,13 @@ A:
 - 检查网络连接
 - 查看日志文件获取详细错误信息
 
+### Q: 抖音或视频号下载失败怎么办？
+
+A:
+- 打开 **设置 → 抖音 Cookie** 或 **设置 → 视频号 Cookie（腾讯元宝）**
+- 选择刚才登录时使用的 Chrome 用户
+- 重新打开对应网页完成登录，再点击“读取 Cookie”和“测试 Cookie”
+- 视频号不需要安装证书或开启系统代理，但需要腾讯元宝处于登录状态
+- 详细步骤见 [Cookie 配置](/guide/cookies-config) 和 [视频号下载](/guide/wechat-channels-download)
+
 更多问题，请访问 [GitHub Issues](https://github.com/yu-hou/VideoCaptioner-customize/issues)。

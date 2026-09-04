@@ -83,6 +83,12 @@ class Config(QConfig):
     )
     douyin_chrome_profile = ConfigItem("Download", "DouyinChromeProfile", "")
     douyin_test_url = ConfigItem("Download", "DouyinTestUrl", "")
+    yuanbao_chrome_profile = ConfigItem("Download", "YuanbaoChromeProfile", "")
+    yuanbao_test_url = ConfigItem(
+        "Download",
+        "YuanbaoTestUrl",
+        "https://weixin.qq.com/sph/AtBrYj8dQb",
+    )
 
     # 主页自动流水线处理范围（默认全流程，兼容旧行为）
     pipeline_scope = OptionsConfigItem(

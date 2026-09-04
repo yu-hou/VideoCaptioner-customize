@@ -2,6 +2,20 @@
 
 本指南将帮助你配置浏览器 Cookie，以便下载需要登录才能访问的视频。
 
+## 软件内一键读取（抖音 / 视频号）
+
+抖音和微信视频号不需要手动导出 Cookie 文件。和首次启动向导一样：
+
+1. 打开 **设置 → 抖音 Cookie** 或 **设置 → 视频号 Cookie（腾讯元宝）**。
+2. 选择平时使用的 Chrome 用户。
+3. 点击 **打开抖音** 或 **打开腾讯元宝**，完成登录（抖音还需确认视频能播放）。
+4. 回到 NovaCaption，点击 **读取 Cookie**。
+5. 粘贴测试链接，点击 **测试 Cookie**。
+
+两次读取都只保存对应网站的 Cookie，并写入同一份 `AppData/cookies.txt`，不会互相覆盖。视频号解析依赖腾讯元宝登录状态，详细步骤见 [视频号下载](./wechat-channels-download.md)。
+
+YouTube、B 站等其他平台仍可按下面的扩展导出方式补充 Cookie。
+
 ## 为什么需要配置 Cookie？
 
 在使用 NovaCaption 下载视频时，你可能会遇到以下错误：
@@ -15,12 +29,12 @@
 3. **地区限制**的内容需要特定账号权限
 
 :::tip 何时需要配置
-只有当你看到上述错误提示时才需要配置 Cookie。大多数情况下，NovaCaption 可以直接下载视频。
+抖音、视频号必须先在软件内读取 Cookie。YouTube、B 站等平台通常可直接下载，只有出现登录或清晰度错误时才需要按下面步骤导出 `cookies.txt`。
 :::
 
 ---
 
-## 配置步骤
+## 其他平台：导出 cookies.txt
 
 ### 1. 安装浏览器扩展
 
@@ -135,7 +149,7 @@ NovaCaption/
 
 NovaCaption 使用 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 作为下载引擎，支持 1000+ 个视频网站，包括：
 
-- 🎬 YouTube、Bilibili、抖音、快手
+- 🎬 YouTube、Bilibili、抖音、快手、微信视频号
 - 📺 爱奇艺、腾讯视频、优酷
 - 🎓 Coursera、Udemy、Khan Academy
 - 🐦 Twitter、Facebook、Instagram

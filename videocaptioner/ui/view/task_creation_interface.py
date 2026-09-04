@@ -39,7 +39,8 @@ from videocaptioner.core.entities import (
     SupportedVideoFormats,
 )
 from videocaptioner.core.utils.platform_utils import open_folder
-from videocaptioner.core.utils.url_parser import extract_urls
+from videocaptioner.core.utils.url_parser import extract_urls, is_wechat_channels_url
+from videocaptioner.core.utils.yuanbao_cookie import get_yuanbao_cookie_status
 from videocaptioner.ui.common.config import cfg
 from videocaptioner.ui.components.BatchUrlDialog import BatchUrlDialog
 from videocaptioner.ui.thread.video_download_thread import VideoDownloadThread
@@ -463,6 +464,17 @@ class TaskCreationInterface(QWidget):
     def _process_url(self, url):
         # 检测 cookies.txt 文件
         cookiefile_path = APPDATA_PATH / "cookies.txt"
+        if is_wechat_channels_url(url) and get_yuanbao_cookie_status().cookie_count == 0:
+            InfoBar.warning(
+                self.tr("视频号需要腾讯元宝 Cookie"),
+                self.tr(
+                    "请前往“设置 → 视频号 Cookie”，选择 Chrome 用户，"
+                    "打开腾讯元宝登录后再点击“读取 Cookie”"
+                ),
+                duration=INFOBAR_DURATION_WARNING,
+                parent=self,
+            )
+            return
         if not cookiefile_path.exists():
             InfoBar.warning(
                 self.tr("警告"),

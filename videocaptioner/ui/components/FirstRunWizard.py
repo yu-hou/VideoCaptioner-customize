@@ -27,6 +27,7 @@ from qfluentwidgets import (
 
 from videocaptioner.ui.common.config import cfg
 from videocaptioner.ui.components.DouyinCookieManager import DouyinCookieManager
+from videocaptioner.ui.components.YuanbaoCookieManager import YuanbaoCookieManager
 
 
 class FirstRunWizard(QDialog):
@@ -52,6 +53,7 @@ class FirstRunWizard(QDialog):
         self.pages.addWidget(self._create_welcome_page())
         self.pages.addWidget(self._create_work_dir_page())
         self.pages.addWidget(self._create_douyin_page())
+        self.pages.addWidget(self._create_yuanbao_page())
         self.pages.addWidget(self._create_finish_page())
 
         self.buttonSeparator = QFrame(self)
@@ -83,6 +85,7 @@ class FirstRunWizard(QDialog):
         self.nextButton.clicked.connect(self._go_next)
         self.pages.currentChanged.connect(self._update_buttons)
         self.cookieManager.busyChanged.connect(self._on_cookie_busy)
+        self.yuanbaoCookieManager.busyChanged.connect(self._on_cookie_busy)
         qconfig.themeChanged.connect(self._apply_theme)
         qconfig.themeColorChanged.connect(self._apply_theme)
         self._apply_theme()
@@ -107,7 +110,7 @@ class FirstRunWizard(QDialog):
         page, layout = self._page(
             self.tr("欢迎使用 NovaCaption"),
             self.tr(
-                "这个向导会帮助你设置文件保存位置和抖音下载环境。"
+                "这个向导会帮助你设置文件保存位置、抖音和视频号下载环境。"
                 "所有设置以后都可以在“设置”页面重新修改。"
             ),
         )
@@ -117,7 +120,8 @@ class FirstRunWizard(QDialog):
                 "接下来只需：\n"
                 "1. 选择视频和字幕的保存位置\n"
                 "2. 选择平时使用的 Chrome 用户\n"
-                "3. 登录抖音并读取 Cookie\n\n"
+                "3. 登录抖音并读取 Cookie\n"
+                "4. 登录腾讯元宝并读取视频号 Cookie\n\n"
                 "NovaCaption 是基于 VideoCaptioner 的独立定制版本，"
                 "并非上游官方发行。"
             ),
@@ -170,8 +174,8 @@ class FirstRunWizard(QDialog):
         )
         reminder = QLabel(
             self.tr(
-                "如果以后抖音提示 Cookie 失效，请打开：\n"
-                "设置 → 抖音 Cookie → 打开抖音 → 读取 Cookie → 测试 Cookie"
+                "如果以后提示 Cookie 失效，请在设置中打开对应平台的 Cookie 卡片，"
+                "重新登录、读取并测试 Cookie。视频号不需要安装证书或开启系统代理。"
             ),
             page,
         )
@@ -179,6 +183,23 @@ class FirstRunWizard(QDialog):
         reminder.setWordWrap(True)
         layout.addWidget(reminder)
         layout.addStretch(1)
+        return page
+
+    def _create_yuanbao_page(self) -> QWidget:
+        page, layout = self._page(
+            self.tr("配置视频号下载"),
+            self.tr(
+                "选择 Chrome 用户，点击“打开腾讯元宝”完成登录，"
+                "再点击“读取 Cookie”。无需安装证书或开启系统代理。"
+            ),
+        )
+        cookie_scroll = ScrollArea(page)
+        cookie_scroll.setObjectName("cookieScrollArea")
+        cookie_scroll.setWidgetResizable(True)
+        cookie_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # type: ignore
+        self.yuanbaoCookieManager = YuanbaoCookieManager(cookie_scroll)
+        cookie_scroll.setWidget(self.yuanbaoCookieManager)
+        layout.addWidget(cookie_scroll, 1)
         return page
 
     def _choose_work_dir(self):

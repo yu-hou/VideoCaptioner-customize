@@ -8,7 +8,11 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 from videocaptioner.config import APPDATA_PATH
 from videocaptioner.core.utils.logger import setup_logger
-from videocaptioner.core.utils.url_parser import normalize_video_url
+from videocaptioner.core.utils.url_parser import (
+    is_wechat_channels_url,
+    normalize_video_url,
+)
+from videocaptioner.core.utils.wechat_channels import WechatChannelsClient
 
 logger = setup_logger("video_download_thread")
 
@@ -30,6 +34,8 @@ class VideoDownloadThread(QThread):
         self.url = normalize_video_url(url)
         if self.url != url:
             logger.info("抖音精选链接已转换为标准视频链接: %s", self.url)
+        if is_wechat_channels_url(self.url):
+            logger.info("已识别视频号链接，将使用腾讯元宝 Cookie 解析")
         self.work_dir = work_dir
 
     def run(self):
@@ -118,9 +124,24 @@ class VideoDownloadThread(QThread):
 
         return sanitized
 
+    def _download_wechat_channels(self):
+        client = WechatChannelsClient()
+        video_path, media = client.download(
+            self.url,
+            self.work_dir,
+            progress=lambda percent, message: self.progress.emit(percent, message),
+        )
+        info_dict = dict(media.raw_info or {})
+        info_dict.setdefault("title", media.title)
+        info_dict.setdefault("thumbnail", media.thumbnail_url)
+        return video_path, None, None, info_dict
+
     def download(self, need_subtitle: bool = True, need_thumbnail: bool = False):
         """下载视频"""
         logger.info("开始下载视频: %s", self.url)
+
+        if is_wechat_channels_url(self.url):
+            return self._download_wechat_channels()
 
         # 初始化 ydl 选项
         initial_ydl_opts = {

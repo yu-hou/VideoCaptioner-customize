@@ -11,6 +11,21 @@ URL_PATTERN = re.compile(r"https?://[^\s<>\"'，。；：！？、）】》\]|,;
 
 _TRAILING_PUNCT = ".,;:!?)]}，。；：！？、）】》"
 
+def is_wechat_channels_url(url: str) -> bool:
+    """是否为微信视频号分享/预览链接。"""
+    try:
+        parsed = urlsplit(url)
+    except ValueError:
+        return False
+
+    hostname = (parsed.hostname or "").lower()
+    path = parsed.path.rstrip("/")
+    if hostname == "weixin.qq.com":
+        return path.startswith("/sph/")
+    if hostname == "channels.weixin.qq.com":
+        return path.startswith("/finder-preview/") or path.startswith("/web/pages/feed")
+    return False
+
 
 def normalize_video_url(url: str) -> str:
     """将已知的视频分享页链接转换为 yt-dlp 支持的标准链接。"""

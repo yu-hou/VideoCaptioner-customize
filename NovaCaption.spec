@@ -108,11 +108,12 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    # A console bootloader makes a bundled macOS application background-only
-    # (LSBackgroundOnly=1). That removes its Dock icon and prevents reliable
-    # keyboard focus/paste handling. Windows retains the console bootloader so
-    # the same executable can continue to serve both GUI and CLI use cases.
-    console=sys.platform != "darwin",
+    # Windowed bootloader on every desktop platform:
+    # - macOS: a console bootloader marks the app LSBackgroundOnly and breaks
+    #   Dock icon / keyboard focus.
+    # - Windows: a console bootloader shows a terminal that kills the app when
+    #   closed. CLI commands attach to the parent console at runtime instead.
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

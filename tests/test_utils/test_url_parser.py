@@ -1,6 +1,10 @@
 """Tests for multi-URL extraction used by batch download."""
 
-from videocaptioner.core.utils.url_parser import extract_urls, normalize_video_url
+from videocaptioner.core.utils.url_parser import (
+    extract_urls,
+    is_wechat_channels_url,
+    normalize_video_url,
+)
 
 
 def test_extract_urls_from_newlines():
@@ -49,3 +53,26 @@ def test_extract_urls_from_share_text_and_normalize_douyin():
 def test_normalize_video_url_passthrough():
     url = "https://www.youtube.com/watch?v=abc"
     assert normalize_video_url(url) == url
+
+
+def test_detect_wechat_channels_share_urls():
+    assert is_wechat_channels_url("https://weixin.qq.com/sph/AtBrYj8dQb")
+    assert is_wechat_channels_url(
+        "https://channels.weixin.qq.com/finder-preview/pages/sph?id=AtBrYj8dQb"
+    )
+    assert is_wechat_channels_url(
+        "https://channels.weixin.qq.com/web/pages/feed?eid=export-1"
+    )
+    assert not is_wechat_channels_url("https://weixin.qq.com/")
+    assert not is_wechat_channels_url("https://example.com/sph/AtBrYj8dQb")
+
+
+def test_extract_urls_from_wechat_channels_share_text():
+    text = (
+        "发现一个视频，一起来看 "
+        "https://weixin.qq.com/sph/AtBrYj8dQb ，"
+        "再看这个 https://www.bilibili.com/video/BV1xxx"
+    )
+    urls = extract_urls(text)
+    assert urls[0] == "https://weixin.qq.com/sph/AtBrYj8dQb"
+    assert "bilibili.com" in urls[1]
