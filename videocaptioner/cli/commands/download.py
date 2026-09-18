@@ -6,7 +6,12 @@ from typing import Any
 
 from videocaptioner.cli import exit_codes as EXIT
 from videocaptioner.cli import output
-from videocaptioner.core.utils.url_parser import is_wechat_channels_url
+from videocaptioner.core.utils.douyin_client import DouyinClient, DouyinError
+from videocaptioner.core.utils.url_parser import (
+    is_douyin_url,
+    is_wechat_channels_url,
+    normalize_video_url,
+)
 from videocaptioner.core.utils.wechat_channels import (
     WechatChannelsClient,
     WechatChannelsError,
@@ -14,7 +19,7 @@ from videocaptioner.core.utils.wechat_channels import (
 
 
 def run(args: Namespace, config: dict) -> int:
-    url = args.url
+    url = normalize_video_url(args.url)
     out_dir = getattr(args, "output", None) or "."
     quiet = getattr(args, "quiet", False)
 
@@ -36,6 +41,26 @@ def run(args: Namespace, config: dict) -> int:
                 progress.finish(f"Downloaded to {video_path}")
             return EXIT.SUCCESS
 
+        # 抖音：yt-dlp 的提取器缺平台要求的双重签名，走自研客户端
+        if is_douyin_url(url):
+            try:
+                client = DouyinClient()
+                video_path, _media = client.download(
+                    url,
+                    out_dir,
+                    progress=None
+                    if progress is None
+                    else lambda percent, message: progress.update(percent, message),
+                )
+                if progress:
+                    progress.finish(f"Downloaded to {video_path}")
+                return EXIT.SUCCESS
+            except DouyinError as e:
+                if progress:
+                    progress.update(0, f"抖音自研通道失败，尝试 yt-dlp: {e}")
+                else:
+                    output.hint(f"抖音自研通道失败，尝试 yt-dlp: {e}")
+
         try:
             import yt_dlp
         except ImportError:
@@ -53,6 +78,15 @@ def run(args: Namespace, config: dict) -> int:
             "quiet": quiet,
             "no_warnings": quiet,
         }
+        # 与 GUI 保持一致：带上已导入的 Cookie，供需要登录的站点使用
+        cookiefile = Path(config.get("cookie_path", "") or "") if config else Path()
+        if not cookiefile.is_file():
+            from videocaptioner.config import APPDATA_PATH
+
+            cookiefile = APPDATA_PATH / "cookies.txt"
+        if cookiefile.is_file():
+            ydl_opts["cookiefile"] = str(cookiefile)
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:  # type: ignore[arg-type]
             ydl.download([url])
 
