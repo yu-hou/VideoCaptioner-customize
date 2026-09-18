@@ -41,10 +41,24 @@ class WechatChannelsMedia:
 
 
 def sanitize_media_filename(name: str, replacement: str = "_") -> str:
-    """Return a safe cross-platform filename."""
+    """Return a safe cross-platform filename.
+
+    上限按**字节**而非字符计算：多数系统限制单级路径名 255 字节，
+    中文标题每字符 3 字节，按 200 字符截断会超限并触发 ENAMETOOLONG。
+    """
     sanitized = re.sub(r'[<>:"/\\|?*]', replacement, name)
     sanitized = re.sub(r"[\0-\31]", "", sanitized).rstrip(" .")
-    return (sanitized or "视频号视频")[:200]
+
+    encoded = sanitized.encode("utf-8")
+    if len(encoded) <= 180:
+        return sanitized
+    truncated = encoded[:180]
+    while truncated:
+        try:
+            return truncated.decode("utf-8").rstrip(" .")
+        except UnicodeDecodeError:
+            truncated = truncated[:-1]
+    return ""
 
 
 def _iter_netscape_cookies(cookie_path: Path):

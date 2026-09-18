@@ -120,7 +120,7 @@ class FirstRunWizard(QDialog):
                 "接下来只需：\n"
                 "1. 选择视频和字幕的保存位置\n"
                 "2. 选择平时使用的 Chrome 用户\n"
-                "3. 登录抖音并读取 Cookie\n"
+                "3. 打开抖音首页并读取 Cookie（无需登录）\n"
                 "4. 登录腾讯元宝并读取视频号 Cookie\n\n"
                 "NovaCaption 是基于 VideoCaptioner 的独立定制版本，"
                 "并非上游官方发行。"
@@ -154,8 +154,8 @@ class FirstRunWizard(QDialog):
         page, layout = self._page(
             self.tr("配置抖音下载"),
             self.tr(
-                "先选择 Chrome 用户，再点击“打开抖音”完成登录和验证，"
-                "最后点击“读取 Cookie”。这一步也可以暂时跳过。"
+                "先选择 Chrome 用户，再点击“打开抖音”、播放任意一个视频，"
+                "最后点击“读取 Cookie”。登录不是必需的，这一步也可以暂时跳过。"
             ),
         )
         cookie_scroll = ScrollArea(page)

@@ -7,8 +7,10 @@ import yt_dlp
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from videocaptioner.config import APPDATA_PATH
+from videocaptioner.core.utils.douyin_client import DouyinClient
 from videocaptioner.core.utils.logger import setup_logger
 from videocaptioner.core.utils.url_parser import (
+    is_douyin_url,
     is_wechat_channels_url,
     normalize_video_url,
 )
@@ -124,6 +126,29 @@ class VideoDownloadThread(QThread):
 
         return sanitized
 
+    def _download_douyin(self):
+        """抖音走自建签名客户端。
+
+        yt-dlp 的抖音提取器缺少平台现在要求的双重签名，即使带着登录 Cookie
+        也会失败，所以这里优先用自己的实现，失败后再回退 yt-dlp。
+        """
+        client = DouyinClient()
+        video_path, media = client.download(
+            self.url,
+            self.work_dir,
+            progress=lambda percent, message: self.progress.emit(percent, message),
+        )
+        info_dict = dict(media.raw_info or {})
+        info_dict["id"] = media.aweme_id or info_dict.get("aweme_id", "")
+        info_dict["title"] = media.title
+        info_dict["description"] = media.description or media.title
+        info_dict["thumbnail"] = media.thumbnail_url
+        info_dict["duration"] = media.duration
+        info_dict["uploader"] = media.author
+        info_dict["width"] = media.width
+        info_dict["height"] = media.height
+        return video_path, None, None, info_dict
+
     def _download_wechat_channels(self):
         client = WechatChannelsClient()
         video_path, media = client.download(
@@ -143,6 +168,16 @@ class VideoDownloadThread(QThread):
         if is_wechat_channels_url(self.url):
             return self._download_wechat_channels()
 
+        if is_douyin_url(self.url):
+            try:
+                return self._download_douyin()
+            except Exception as exc:
+                logger.warning("抖音专用通道失败，回退 yt-dlp: %s", exc)
+                self.progress.emit(0, "抖音自研通道失败，尝试 yt-dlp...")
+
+        return self._download_with_ytdlp(need_subtitle, need_thumbnail)
+
+    def _download_with_ytdlp(self, need_subtitle: bool, need_thumbnail: bool):
         # 初始化 ydl 选项
         initial_ydl_opts = {
             "outtmpl": {

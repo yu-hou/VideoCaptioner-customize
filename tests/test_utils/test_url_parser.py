@@ -76,3 +76,24 @@ def test_extract_urls_from_wechat_channels_share_text():
     urls = extract_urls(text)
     assert urls[0] == "https://weixin.qq.com/sph/AtBrYj8dQb"
     assert "bilibili.com" in urls[1]
+
+
+def test_normalize_douyin_discover_modal_id():
+    url = "https://www.douyin.com/discover?modal_id=7659705531116870065&prevent_show=1"
+    assert normalize_video_url(url) == "https://www.douyin.com/video/7659705531116870065"
+
+
+def test_normalize_leaves_user_page_alone():
+    url = "https://www.douyin.com/user/MS4wLjABAAAA?modal_id=7659705531116870065"
+    assert normalize_video_url(url) == url
+
+
+def test_is_douyin_url_covers_all_hosts():
+    from videocaptioner.core.utils.url_parser import is_douyin_url
+
+    assert is_douyin_url("https://www.douyin.com/video/7658521293041438003")
+    assert is_douyin_url("https://v.douyin.com/AbCdEfGhIjK/")
+    assert is_douyin_url("https://www.iesdouyin.com/share/video/7658521293041438003")
+    assert is_douyin_url("https://www.douyin.com/jingxuan?modal_id=7658521293041438003")
+    assert not is_douyin_url("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    assert not is_douyin_url("")

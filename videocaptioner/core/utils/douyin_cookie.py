@@ -22,6 +22,11 @@ DOUYIN_COOKIE_DOMAINS = (
     "snssdk.com",
 )
 
+#: 下载抖音视频真正依赖的 Cookie：访客标识 + 浏览器指纹。
+#: 两者都是 Chrome 访问过 douyin.com 就会产生，不需要登录。
+VISITOR_ID_COOKIES = ("UIFID", "UIFID_TEMP")
+FINGERPRINT_COOKIES = ("s_v_web_id",)
+
 
 @dataclass(frozen=True)
 class ChromeProfile:
@@ -114,6 +119,34 @@ def get_douyin_cookie_status(
     return DouyinCookieStatus(exists, count, updated_at)
 
 
+def missing_essential_cookies(cookie_path: Path = DOUYIN_COOKIE_PATH) -> list[str]:
+    """Return the essential cookie names absent from the saved cookie file."""
+    if not cookie_path.is_file():
+        return list(VISITOR_ID_COOKIES + FINGERPRINT_COOKIES)
+
+    present: set[str] = set()
+    try:
+        with cookie_path.open("r", encoding="utf-8") as cookie_file:
+            for raw_line in cookie_file:
+                line = raw_line.rstrip("\n")
+                if line.startswith("#HttpOnly_"):
+                    line = line.removeprefix("#HttpOnly_")
+                elif line.startswith("#"):
+                    continue
+                fields = line.split("\t")
+                if len(fields) >= 7 and _is_douyin_domain(fields[0]):
+                    present.add(fields[5])
+    except (OSError, UnicodeError):
+        return list(VISITOR_ID_COOKIES + FINGERPRINT_COOKIES)
+
+    missing: list[str] = []
+    if not present.intersection(VISITOR_ID_COOKIES):
+        missing.append("UIFID")
+    if not present.intersection(FINGERPRINT_COOKIES):
+        missing.append("s_v_web_id")
+    return missing
+
+
 def export_douyin_cookies(
     profile: ChromeProfile,
     cookie_path: Path = DOUYIN_COOKIE_PATH,
@@ -139,7 +172,13 @@ def export_douyin_cookies(
 
 
 def test_douyin_cookie(url: str, cookie_path: Path = DOUYIN_COOKIE_PATH) -> str:
-    """Use yt-dlp to validate the saved cookie against a Douyin video URL."""
+    """Validate the saved cookie against a Douyin video URL.
+
+    Uses our own signed client rather than yt-dlp: yt-dlp's Douyin extractor is
+    currently broken independently of whether the cookies are good, so it would
+    report failure for a setup that downloads perfectly well.
+    """
+    from videocaptioner.core.utils.douyin_client import DouyinClient
     from videocaptioner.core.utils.url_parser import normalize_video_url
 
     normalized_url = normalize_video_url(url.strip())
@@ -148,12 +187,5 @@ def test_douyin_cookie(url: str, cookie_path: Path = DOUYIN_COOKIE_PATH) -> str:
     if get_douyin_cookie_status(cookie_path).cookie_count == 0:
         raise RuntimeError("尚未读取有效的抖音 Cookie")
 
-    options = {
-        "cookiefile": str(cookie_path),
-        "skip_download": True,
-        "quiet": True,
-        "no_warnings": True,
-    }
-    with yt_dlp.YoutubeDL(options) as ydl:
-        info = ydl.extract_info(normalized_url, download=False)
-    return info.get("title") or info.get("id") or "抖音视频"
+    media = DouyinClient(cookie_path).resolve(normalized_url)
+    return media.title

@@ -67,6 +67,8 @@ hiddenimports = [
     "fontTools.ttLib",
 ]
 hiddenimports += collect_submodules("qfluentwidgets")
+# 抖音自研下载通道：签名包纯粹靠静态导入使用，显式收集避免 Analysis 漏收
+hiddenimports += collect_submodules("videocaptioner.core.utils.douyin_sign")
 
 excludes = [
     "tkinter",

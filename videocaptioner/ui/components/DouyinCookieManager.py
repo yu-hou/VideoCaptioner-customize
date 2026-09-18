@@ -24,6 +24,7 @@ from videocaptioner.core.utils.douyin_cookie import (
     ChromeProfile,
     get_douyin_cookie_status,
     list_chrome_profiles,
+    missing_essential_cookies,
 )
 from videocaptioner.ui.common.config import cfg
 from videocaptioner.ui.thread.douyin_cookie_thread import DouyinCookieThread
@@ -50,7 +51,7 @@ class ChromeProfileCard(SettingCard):
             FIF.PEOPLE,
             _tr("Chrome 用户"),
             content
-            or _tr("选择已经登录并能正常播放抖音视频的 Chrome Profile"),
+            or _tr("选择在 Chrome 中打开过 douyin.com 的用户配置（无需登录）"),
             parent,
         )
         self.comboBox = ComboBox(self)
@@ -114,7 +115,7 @@ class DouyinCookieManager(SettingCardGroup):
             self.tr("打开抖音"),
             FIF.GLOBE,
             self.tr("登录并完成验证"),
-            self.tr("请使用上方所选 Profile 登录抖音，并确认视频可以正常播放"),
+            self.tr("用上方 Profile 打开抖音、播放任意视频即可，登录不是必需的"),
             self,
         )
         self.importCard = PrimaryPushSettingCard(
@@ -204,7 +205,7 @@ class DouyinCookieManager(SettingCardGroup):
         if not opened:
             QDesktopServices.openUrl(QUrl(DOUYIN_LOGIN_URL))
         self.statusCard.setContent(
-            self.tr("请在 Chrome 中完成登录或人机验证，确认视频可以播放后再读取 Cookie")
+            self.tr("请在 Chrome 中打开抖音并播放视频（无需登录），确认可播放后再读取 Cookie")
         )
 
     def _open_chrome(self, profile: ChromeProfile | None) -> bool:
@@ -280,12 +281,18 @@ class DouyinCookieManager(SettingCardGroup):
             if status.updated_at
             else self.tr("未知")
         )
-        self.statusCard.setContent(
+        summary = (
             self.tr("已保存")
             + f" {status.cookie_count} "
             + self.tr("条抖音 Cookie，更新时间：")
             + updated_at
         )
+        missing = missing_essential_cookies()
+        if missing:
+            summary += "；" + self.tr("缺少关键 Cookie：") + ", ".join(missing) + (
+                "。" + self.tr("请重新打开抖音页面后再读取 Cookie")
+            )
+        self.statusCard.setContent(summary)
 
     def import_cookies(self):
         profile = self.selected_profile()

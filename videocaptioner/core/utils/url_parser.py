@@ -11,6 +11,22 @@ URL_PATTERN = re.compile(r"https?://[^\s<>\"'，。；：！？、）】》\]|,;
 
 _TRAILING_PUNCT = ".,;:!?)]}，。；：！？、）】》"
 
+#: 抖音信息流页面路径，这些页面用 modal_id 指向单个作品
+DOUYIN_FEED_PATHS = frozenset(
+    {"/", "/jingxuan", "/discover", "/recommend", "/explore", "/following"}
+)
+
+
+def _is_douyin_host(parsed_url) -> bool:
+    hostname = (parsed_url.hostname or "").lower()
+    return (
+        hostname == "douyin.com"
+        or hostname.endswith(".douyin.com")
+        or hostname == "iesdouyin.com"
+        or hostname.endswith(".iesdouyin.com")
+    )
+
+
 def is_wechat_channels_url(url: str) -> bool:
     """是否为微信视频号分享/预览链接。"""
     try:
@@ -27,6 +43,14 @@ def is_wechat_channels_url(url: str) -> bool:
     return False
 
 
+def is_douyin_url(url: str) -> bool:
+    """是否为抖音作品链接（含短链、精选链接、分享页）。"""
+    try:
+        return _is_douyin_host(urlsplit(url))
+    except ValueError:
+        return False
+
+
 def normalize_video_url(url: str) -> str:
     """将已知的视频分享页链接转换为 yt-dlp 支持的标准链接。"""
     try:
@@ -34,9 +58,11 @@ def normalize_video_url(url: str) -> str:
     except ValueError:
         return url
 
-    hostname = (parsed_url.hostname or "").lower()
-    is_douyin_host = hostname == "douyin.com" or hostname.endswith(".douyin.com")
-    if not is_douyin_host or parsed_url.path.rstrip("/") != "/jingxuan":
+    if not _is_douyin_host(parsed_url):
+        return url
+
+    # 精选 / 推荐等信息流页面通过 modal_id 指向单个作品
+    if (parsed_url.path.rstrip("/") or "/") not in DOUYIN_FEED_PATHS:
         return url
 
     modal_id = parse_qs(parsed_url.query).get("modal_id", [""])[0]
